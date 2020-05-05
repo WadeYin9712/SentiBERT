@@ -1,5 +1,5 @@
 # SentiBERT
-Code for ACL2020 paper *Da Yin, Tao Meng, Kai-Wei Chang: SentiBERT: A Transferable Transformer-Based Architecture for Compositional Sentiment Semantics. In Proceedings of the 58th Annual Meeting of the Association of Computational Linguistics (ACL'2020)*.
+Code for *SentiBERT: A Transferable Transformer-Based Architecture for Compositional Sentiment Semantics* (ACL'2020).
 
 ## Model Architecture
 <p align="center">
@@ -12,5 +12,5 @@ Code for ACL2020 paper *Da Yin, Tao Meng, Kai-Wei Chang: SentiBERT: A Transferab
 * Pytorch == 1.1.0
 * CUDA == 10.2
 * NVIDIA GeForce GTX 1080 Ti
-* HuggingFaces Pytorch (also known as pytorch-pretrained-transformers & transformers)
+* HuggingFaces Pytorch (also known as pytorch-pretrained-bert & transformers)
 * Numpy, Pickle, Tqdm, Scipy, etc.
