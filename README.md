@@ -2,6 +2,9 @@
 Code for ACL2020 paper *Da Yin, Tao Meng, Kai-Wei Chang: SentiBERT: A Transferable Transformer-Based Architecture for Compositional Sentiment Semantics. In Proceedings of the 58th Annual Meeting of the Association of Computational Linguistics (ACL'2020)*.
 
 ## Model Architecture
+<p align="center">
+    <img src="model.png" height="200" />
+</p> 
 
 ## Getting Started
 ### Requirements
