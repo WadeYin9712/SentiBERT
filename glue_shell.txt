@@ -1,0 +1,60 @@
+# fine_tuning on QNLI(ARC)
+nohup python ./examples/run_glue.py \
+--model_type bert \
+--model_name_or_path ./bert-base-uncased \
+--task_name QNLI \
+--do_train \
+--do_eval \
+--do_lower_case \
+--data_dir glue_data/QNLI \
+--max_seq_length 128 \
+--per_gpu_eval_batch_size=8   \
+--per_gpu_train_batch_size=8   \
+--learning_rate 2e-5 \
+--num_train_epochs 3.0 \
+--output_dir /tmp/QNLI/
+
+
+nohup python ./examples/run_glue.py \
+    --model_type bert \
+    --model_name_or_path ./bert-base-uncased \
+    --task_name MRPC \
+    --do_train \
+    --do_eval \
+    --do_lower_case \
+    --data_dir glue_data/MRPC \
+    --max_seq_length 128 \
+    --per_gpu_eval_batch_size=8   \
+    --per_gpu_train_batch_size=8   \
+    --learning_rate 2e-5 \
+    --num_train_epochs 3.0 \
+    --output_dir /tmp/MRPC/ &
+    
+CUDA_VISIBLE_DEVICES=1 python ./examples/run_glue.py \
+    --model_type bert_mask \
+    --model_name_or_path ./bert-base-uncased \
+    --task_name iest \
+    --do_eval \
+    --do_lower_case \
+    --data_dir glue_data/iest \
+    --max_seq_length 128 \
+    --per_gpu_eval_batch_size=8   \
+    --per_gpu_train_batch_size=8   \
+    --learning_rate 2e-5 \
+    --num_train_epochs 3.0 \
+    --output_dir ./tmp/iest/
+
+export TRAIN_FILE=/path/to/dataset/wiki.train.raw
+export TEST_FILE=/path/to/dataset/wiki.test.raw
+
+
+nohup python run_lm_finetuning.py \
+    --output_dir=./lmoutputtest \
+    --model_type=bert \
+    --model_name_or_path=../bert-base-uncased \
+    --mlm \
+    --train_data_file=../lmdata/wikitext-2-raw/wiki.train.raw \
+    --do_train \
+    --do_eval \
+    --eval_data_file=../lmdata/wikitext-2-raw/wiki.test.raw &
+    
