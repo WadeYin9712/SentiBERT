@@ -3,7 +3,7 @@ Code for ACL2020 paper *Da Yin, Tao Meng, Kai-Wei Chang: SentiBERT: A Transferab
 
 ## Model Architecture
 <p align="center">
-    <img src="model.png" height="400" />
+    <img src="model.png" height="300" />
 </p> 
 
 ## Getting Started
