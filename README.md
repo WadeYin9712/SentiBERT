@@ -10,5 +10,7 @@ Code for ACL2020 paper *Da Yin, Tao Meng, Kai-Wei Chang: SentiBERT: A Transferab
 ### Requirements
 * Python == 3.6.10
 * Pytorch == 1.1.0
+* CUDA == 10.2
+* NVIDIA GeForce GTX 1080 Ti
 * HuggingFaces Pytorch (also known as pytorch-pretrained-transformers & transformers)
 * Numpy, Pickle, Tqdm, Scipy, etc.
