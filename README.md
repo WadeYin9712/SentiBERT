@@ -9,6 +9,7 @@ https://arxiv.org/abs/2005.04114
 
 ## Requirements
 ### Environment
+```
 * Python == 3.6.10
 * Pytorch == 1.1.0
 * CUDA == 10.2
@@ -16,9 +17,11 @@ https://arxiv.org/abs/2005.04114
 * HuggingFaces Pytorch (also known as pytorch-pretrained-bert & transformers)
 * Stanford CoreNLP (stanford-corenlp-full-2018-10-05)
 * Numpy, Pickle, Tqdm, Scipy, etc. (See requirement.txt)
+```
 
 ### Datasets
 Datasets include:
+```
 * SST-phrase
 * SST-5 (almost the same with SST-phrase)
 * SST-3 (almost the same with SST-phrase)
@@ -26,6 +29,7 @@ Datasets include:
 * Twitter Sentiment Analysis (SemEval 2017 Task 4)
 * EmoContext (SemEval 2019 Task 3)
 * EmoInt (Joy, Fear, Sad, Anger) (SemEval 2018 Task 1c)
+```
 
 ### File Architecture (Selected important files)
 ```
