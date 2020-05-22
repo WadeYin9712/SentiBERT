@@ -110,13 +110,14 @@ In preprocessing part, we provide implementation to extract related information 
 ```
 In `simple_accuracy_phrase()`, we will provide statistical details and evaluate for each metric.
 
+## Acknowledgement
+Here we would like to thank for BERT/RoBERTa implementation of HuggingFace and sentiment tree parser of Stanford CoreNLP. Also, thanks for the dataset release of SemEval. To confirm the privacy rule of SemEval task organizer, we only choose the publicable datasets of each task.
+
 ## Citation
 Please cite our ACL paper if this repository inspired your work.
 ```
-@inproceedings{yinda2020,
-  author    = {Da Yin,
-               Tao Meng,
-               Kai-Wei Chang},
+@inproceedings{yin2020sentibert,
+  author    = {Yin, Da and Meng, Tao and Chang, Kai-Wei},
   title     = {{SentiBERT}: A Transferable Transformer-Based Architecture for Compositional Sentiment Semantics},
   booktitle = {Proceedings of the 58th Conference of the Association for Computational Linguistics, {ACL} 2020, Seattle, USA},
   year      = {2020},
