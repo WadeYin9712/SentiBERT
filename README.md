@@ -81,21 +81,34 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
   --do_train \
   --do_eval \
   --do_lower_case \
-  --data_dir /local/harold/backup_code_wade/pytorch-pretrained-BERT/glue_data/xxx \ ---> the same name as task_name
+  --data_dir /glue_data/xxx \ ---> the same name as task_name
   --bert_model bert-base-uncased \
   --max_seq_length 128 \
   --train_batch_size xxx \
   --learning_rate xxx \
   --num_train_epochs xxx \                                                          
-  --domain xxx \                                                                    ---> specifically used in EmoInt task
-  --output_dir /local/harold/backup_code_wade/pytorch-pretrained-BERT/results/xxx \ ---> the same name as task_name
+  --domain xxx \                                                                    ---> used in EmoInt task
+  --output_dir /results/xxx \ ---> the same name as task_name
   --seed xxx \
-  --para xxx                                                                        ---> choose pretrained SentiBERT or pretrained BERT
+  --para xxx                                                                        ---> pretrained SentiBERT or BERT
 ```
 More fine-tuning details will be shown in `README.md` of `/examples` repo.
 
 ## Analysis
+Here we provide analysis implementation in our paper. We will focus on the evaluation of 
+* local difficulty
+* global difficulty
+* negation
+* contrastive relation
 
+In preprocessing part, we provide implementation to extract related information in the test set of SST-phrase and store them in 
+```
+-- /glue_data/sstphrase/swap_test_new.npy                   ---> global difficulty
+-- /glue_data/sstphrase/edge_swap_test_new.npy              ---> local difficulty
+-- /glue_data/sstphrase/neg_new.npy                         ---> negation
+-- /glue_data/sstphrase/but_new.npy                         ---> contrastive relation
+```
+In `simple_accuracy_phrase()`, we will evaluate for each metric.
 
 ## Citation
 Please cite our ACL paper if this repository inspired your work.
