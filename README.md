@@ -39,6 +39,7 @@ Datasets include:
 -- /examples/lm_finetuning/pregenerate_training_data_sstphrase.py   ---> generate pretrained epoches
 -- /examples/lm_finetuning/finetune_on_pregenerated_sstphrase.py    ---> pretrain on generated epoches
 -- /stanford-corenlp-full-2018-10-05/xxx_st.py (under construction) ---> preprocess raw text and constituency tree
+-- /transformers (under construction)                               ---> RoBERTa part
 ```
 
 ## Get Started
@@ -70,3 +71,44 @@ CUDA_VISIBLE_DEVICES=7 python3 finetune_on_pregenerated_sstphrase.py \
         --output_dir /results/sstphrase_pretrain \
         --epochs 3
 ```
+The pre-trained parameters will be released here. [Google Drive]
+
+## Fine-tuning 
+Run run_classifier_new.py directly as follows:
+```
+CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
+  --task_name xxx \                                                                 ---> task name
+  --do_train \
+  --do_eval \
+  --do_lower_case \
+  --data_dir /local/harold/backup_code_wade/pytorch-pretrained-BERT/glue_data/xxx \ ---> the same name as task_name
+  --bert_model bert-base-uncased \
+  --max_seq_length 128 \
+  --train_batch_size xxx \
+  --learning_rate xxx \
+  --num_train_epochs xxx \                                                          
+  --domain xxx \                                                                    ---> specifically used in EmoInt task
+  --output_dir /local/harold/backup_code_wade/pytorch-pretrained-BERT/results/xxx \ ---> the same name as task_name
+  --seed xxx \
+  --para xxx                                                                        ---> choose pretrained SentiBERT or pretrained BERT
+```
+More fine-tuning details will be shown in `README.md` of `/examples` repo.
+
+## Analysis
+
+
+## Citation
+Please cite our ACL paper if this repository inspired your work.
+```
+@inproceedings{yinda2020,
+  author    = {Da Yin,
+               Tao Meng,
+               Kai-Wei Chang},
+  title     = {{SentiBERT}: A Transferable Transformer-Based Architecture for Compositional Sentiment Semantics},
+  booktitle = {Proceedings of the 58th Conference of the Association for Computational Linguistics, {ACL} 2020, Seattle, USA},
+  year      = {2020},
+}
+```
+    
+## Contact
+* Due to the difference of environment, the results will be a bit different. If you have any questions regarding the code, please create an issue or contact the [owner](https://github.com/WadeYin9712) of this repository.
