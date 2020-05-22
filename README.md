@@ -77,7 +77,7 @@ The pre-trained parameters will be released here. [Google Drive]
 Run run_classifier_new.py directly as follows:
 ```
 CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
-  --task_name xxx \                                                                 ---> task name
+  --task_name xxx \                                                ---> task name
   --do_train \
   --do_eval \
   --do_lower_case \
@@ -87,10 +87,10 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
   --train_batch_size xxx \
   --learning_rate xxx \
   --num_train_epochs xxx \                                                          
-  --domain xxx \                                                                    ---> used in EmoInt task
+  --domain xxx \                                                   ---> used in EmoInt task
   --output_dir /results/xxx \ ---> the same name as task_name
   --seed xxx \
-  --para xxx                                                                        ---> pretrained SentiBERT or BERT
+  --para xxx                                                       ---> pretrained SentiBERT or BERT
 ```
 More fine-tuning details will be shown in `README.md` of `/examples` repo.
 
@@ -108,7 +108,7 @@ In preprocessing part, we provide implementation to extract related information 
 -- /glue_data/sstphrase/neg_new.npy                         ---> negation
 -- /glue_data/sstphrase/but_new.npy                         ---> contrastive relation
 ```
-In `simple_accuracy_phrase()`, we will evaluate for each metric.
+In `simple_accuracy_phrase()`, we will provide statistical details and evaluate for each metric.
 
 ## Citation
 Please cite our ACL paper if this repository inspired your work.
