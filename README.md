@@ -56,7 +56,7 @@ export PYTHONPATH=$PYTHONPATH:XX/
 ```
 java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,parse,sentiment -file xxx_train\dev\test_text.txt -outputFormat json -ssplit.eolonly true -tokenize.whitespace true
 ```
-3. Run `/stanford-corenlp-full-2018-10-05/xxx_st.py` to transform the tree structure into matrices `/glue_data/xxx/xxx_train\dev\test_span.npy` and `/glue_data/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as mask in the first layer of our attention mechanism. The second matrix is used as mask in the second layer. Will first publish them via Google Drive.
+3. Run `/stanford-corenlp-full-2018-10-05/xxx_st.py` to transform the tree structure into matrices `/glue_data/xxx/xxx_train\dev\test_span.npy` and `/glue_data/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as mask in the first layer of our attention mechanism. The second matrix is used as mask in the second layer.
 
 ## Pretraining
 1. Generate epoches for preparation
@@ -78,41 +78,55 @@ CUDA_VISIBLE_DEVICES=7 python3 finetune_on_pregenerated_sstphrase.py \
         --output_dir /results/sstphrase_pretrain \
         --epochs 3
 ```
-The pre-trained parameters will be released here. [Google Drive]
+The pre-trained parameters were released here. [[Google Drive]](https://drive.google.com/file/d/1VPKeB_FjrAiSYfEi-F72wtZkaYQD-l7Q/view?usp=sharing)
 
 ## Fine-tuning 
 Run run_classifier_new.py directly as follows:
 ```
 CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
-  --task_name xxx \                                        ---> task name
+  --task_name xxx \                              ---> task name
   --do_train \
   --do_eval \
   --do_lower_case \
-  --data_dir /glue_data/xxx \                              ---> the same name as task_name
+  --data_dir /glue_data/xxx \                    ---> the same name as task_name
   --bert_model bert-base-uncased \
   --max_seq_length 128 \
   --train_batch_size xxx \
   --learning_rate xxx \
   --num_train_epochs xxx \                                                          
-  --domain xxx \                                           ---> used in EmoInt task
-  --output_dir /results/xxx \                              ---> the same name as task_name
+  --domain xxx \                                 ---> "joy", "sad", "fear" or "anger". Used in EmoInt task
+  --output_dir /results/xxx \                    ---> the same name as task_name
   --seed xxx \
-  --para xxx                                               ---> "SentiBERT" or "BERT": pretrained SentiBERT or BERT
+  --para xxx                                     ---> "SentiBERT" or "BERT": pretrained SentiBERT or BERT
 ```
 
 ## Checkpoints
-For reproducity and usability, we provide checkpoints and the original training settings to help you reproduce.
+For reproducity and usability, we provide checkpoints and the original training settings to help you reproduce:
+ * SST-phrase [[Google Drive]](https://drive.google.com/file/d/17if73T2bbOhAqG41RxkJ7HxfusUjm-hg/view?usp=sharing)
+ * SST-5 [[Google Drive]](https://drive.google.com/file/d/17if73T2bbOhAqG41RxkJ7HxfusUjm-hg/view?usp=sharing)
+ * SST-2 [[Google Drive]](https://drive.google.com/file/d/1JiPv5Wv56A6JccgLBS_-1LSFna63iL5T/view?usp=sharing)
+ * SST-3 [[Google Drive]](https://drive.google.com/file/d/1XsmcGyotHfVABaewxY_EcESR7Dku66Ln/view?usp=sharing)
+ * EmoContext [[Google Drive]](https://drive.google.com/file/d/1rpO5rmBY6rX6rbZuyCoGV40J0JpcPo2x/view?usp=sharing)
+ * EmoInt:
+     * Joy [[Google Drive]](https://drive.google.com/file/d/1OTGBRlcWISzH2bl2aKs9YMN2XQKJ9bJj/view?usp=sharing)
+     * Fear [[Google Drive]](https://drive.google.com/file/d/1b8db93qOOpSMJjSRI1pJUumdRS4X83Xg/view?usp=sharing)
+     * Sad [[Google Drive]](https://drive.google.com/file/d/1En9Vcn1JdG8NyxfuQbUCSaToSpUu8Oxp/view?usp=sharing)
+     * Anger [[Google Drive]](https://drive.google.com/file/d/1vm0cSyqTbm41qe_bVtVGkt0mSYTsdQko/view?usp=sharing)
+ * Twitter Sentiment Analysis [[Google Drive]](https://drive.google.com/file/d/16CQh9WdqhzeWfkxToZholnOqmaNEnayG/view?usp=sharing)
+
+The implementation details and results are shown below:
+**Note: BERT* denotes BERT w/ Mean pooling.**
 <table>
   <tr>
-    <th class="tg-0pky">Models</th>
-    <th class="tg-0pky">Batch Size</th>
+    <th>Models</th>
+    <th>Batch Size</th>
     <th class="tg-0pky">Learning Rate</th>
     <th class="tg-0pky">Epochs</th>
     <th class="tg-0pky">Seed</th>
     <th class="tg-0pky">Results</th> 
   </tr>
   <tr>
-    <td class="tg-c3ow" colspan="6">SST-phrase</td>
+    <td colspan="6">SST-phrase</td>
   </tr>
   <tr>
     <td class="tg-0pky">SentiBERT</td>
@@ -273,7 +287,7 @@ Some of the analysis results based on our provided checkpoints are selected and 
   </tr>
   <tr>
     <td class="tg-0pky">SentiBERT</td>
-    <td class="tg-0pky">****</td>
+    <td class="tg-0pky">**[85.41, 60.69, 49.03]**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT*</td>
@@ -284,7 +298,7 @@ Some of the analysis results based on our provided checkpoints are selected and 
   </tr>
   <tr>
     <td class="tg-0pky">SentiBERT</td>
-    <td class="tg-0pky">****</td>
+    <td class="tg-0pky">**[78.34, 76.30, 72.77]**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT*</td>
@@ -302,7 +316,6 @@ Some of the analysis results based on our provided checkpoints are selected and 
     <td class="tg-0pky">27.85</td>
   </tr>
 </table>
-
 
 ## Acknowledgement
 Here we would like to thank for BERT/RoBERTa implementation of HuggingFace and sentiment tree parser of Stanford CoreNLP. Also, thanks for the dataset release of SemEval. To confirm the privacy rule of SemEval task organizer, we only choose the publicable datasets of each task.
