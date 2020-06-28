@@ -34,7 +34,6 @@ from pytorch_pretrained_bert.file_utils import cached_path
 # CONFIG_NAME = "sstphrase.json"
 # WEIGHTS_NAME = "sstphrase.bin"
 
-
 logger = logging.getLogger(__name__)
 
 PRETRAINED_MODEL_ARCHIVE_MAP = {
