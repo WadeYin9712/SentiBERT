@@ -43,6 +43,13 @@ Datasets include:
 ```
 
 ## Get Started
+### Preparing Environment
+```
+pip install -r requirements.txt
+
+export PYTHONPATH=$PYTHONPATH:XX/SentiBERT/
+export PYTHONPATH=$PYTHONPATH:XX/
+```
 ### Preprocessing (under construction)
 1. Split the raw text and golden labels of sentiment/emotion datasets by yourselves into `xxx_train\dev\test_text.txt` and `xxx_label_train\dev\test.npy`, assuming that `xxx` represents task name.
 2. Put the files into `/stanford-corenlp-full-2018-10-05/`. To get binary constituency trees, run
@@ -77,22 +84,167 @@ The pre-trained parameters will be released here. [Google Drive]
 Run run_classifier_new.py directly as follows:
 ```
 CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
-  --task_name xxx \                                                ---> task name
+  --task_name xxx \                                        ---> task name
   --do_train \
   --do_eval \
   --do_lower_case \
-  --data_dir /glue_data/xxx \ ---> the same name as task_name
+  --data_dir /glue_data/xxx \                              ---> the same name as task_name
   --bert_model bert-base-uncased \
   --max_seq_length 128 \
   --train_batch_size xxx \
   --learning_rate xxx \
   --num_train_epochs xxx \                                                          
-  --domain xxx \                                                   ---> used in EmoInt task
-  --output_dir /results/xxx \ ---> the same name as task_name
+  --domain xxx \                                           ---> used in EmoInt task
+  --output_dir /results/xxx \                              ---> the same name as task_name
   --seed xxx \
-  --para xxx                                                       ---> pretrained SentiBERT or BERT
+  --para xxx                                               ---> "SentiBERT" or "BERT": pretrained SentiBERT or BERT
 ```
-More fine-tuning details will be shown in `README.md` of `/examples` repo.
+
+## Checkpoints
+For reproducity and usability, we provide checkpoints and the original training settings to help you reproduce.
+<table>
+  <tr>
+    <th class="tg-0pky">Models</th>
+    <th class="tg-0pky">Batch Size</th>
+    <th class="tg-0pky">Learning Rate</th>
+    <th class="tg-0pky">Epochs</th>
+    <th class="tg-0pky">Seed</th>
+    <th class="tg-0pky">Results</th> 
+  </tr>
+  <tr>
+    <td class="tg-c3ow" colspan="6">SST-phrase</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">5</td>
+    <td class="tg-0pky">30</td>
+    <td class="tg-0pky">**68.89**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT*</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">5</td>
+    <td class="tg-0pky">30</td>
+    <td class="tg-0pky">64.76</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh" colspan="6">SST-5</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">5</td>
+    <td class="tg-0pky">30</td>
+    <td class="tg-0pky">**56.64**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT*</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">5</td>
+    <td class="tg-0pky">30</td>
+    <td class="tg-0pky">49.13</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh" colspan="6">SST-2</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">30</td>
+    <td class="tg-0pky">**93.02**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">30</td>
+    <td class="tg-0pky">92.08</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh" colspan="6">SST-3</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">5</td>
+    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">**77.84**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT*</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">5</td>
+    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">72.71</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh" colspan="6">EmoContext</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">0</td>
+    <td class="tg-0pky">**75.85**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">0</td>
+    <td class="tg-0pky">73.64</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh" colspan="6">EmoInt</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">16</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">4 or 5</td>
+    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">**67.24**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT</td>
+    <td class="tg-0pky">16</td>
+    <td class="tg-0pky">2e-5</td>
+    <td class="tg-0pky">4 or 5</td>
+    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">64.79</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh" colspan="6">Twitter Sentiment Analysis</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">6e-5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">45</td>
+    <td class="tg-0pky">**70.1**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">6e-5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">45</td>
+    <td class="tg-0pky">69.7</td>
+  </tr>
+</table>
 
 ## Analysis
 Here we provide analysis implementation in our paper. We will focus on the evaluation of 
@@ -109,6 +261,48 @@ In preprocessing part, we provide implementation to extract related information 
 -- /glue_data/sstphrase/but_new.npy                         ---> contrastive relation
 ```
 In `simple_accuracy_phrase()`, we will provide statistical details and evaluate for each metric.
+
+Some of the analysis results based on our provided checkpoints are selected and shown below:
+<table>
+  <tr>
+    <th class="tg-0pky">Models</th>
+    <th class="tg-0pky">Results</th> 
+  </tr>
+  <tr>
+    <td class="tg-c3ow" colspan="2">Local Difficulty</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">****</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT*</td>
+    <td class="tg-0pky">[82.42, 55.64, 32.19]</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow" colspan="2">Negation</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">****</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT*</td>
+    <td class="tg-0pky">[74.55, 71.36, 69.72]</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow" colspan="2">Contrastive Relation</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">**39.24**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT*</td>
+    <td class="tg-0pky">27.85</td>
+  </tr>
+</table>
+
 
 ## Acknowledgement
 Here we would like to thank for BERT/RoBERTa implementation of HuggingFace and sentiment tree parser of Stanford CoreNLP. Also, thanks for the dataset release of SemEval. To confirm the privacy rule of SemEval task organizer, we only choose the publicable datasets of each task.
