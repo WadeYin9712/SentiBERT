@@ -220,8 +220,11 @@ def main():
 
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
     
-    if task_name == "sstphrase":
-        model = BertForPhraseClassification.from_pretrained("/local/harold/backup_code_wade/pytorch-pretrained-BERT/results/sstphrase_pretrain", num_labels=num_labels)
+    if task_name == "sstphrase" or task_name == "sst-3":
+        if args.para == "sentibert":
+            model = BertForPhraseClassification.from_pretrained("/local/harold/backup_code_wade/pytorch-pretrained-BERT/results/sstphrase_pretrain", num_labels=num_labels)
+        else:
+            model = BertForPhraseClassification.from_pretrained(args.bert_model, num_labels=num_labels)
     else:
         if args.para == "sentibert":
             model = BertForSequenceClassification.from_pretrained("/local/harold/backup_code_wade/pytorch-pretrained-BERT/results/sstphrase_pretrain", num_labels=num_labels)
@@ -274,7 +277,7 @@ def main():
             #     with open(cached_train_features_file, "rb") as reader:
             #         train_features = pickle.load(reader)
             
-            if task_name == "sstphrase":
+            if task_name == "sstphrase" or task_name == "sst-3":
                 train_features = convert_examples_to_features_phrase(
                         train_examples, args.max_seq_length, tokenizer, output_mode, "train", args.data_dir)
             else:
@@ -297,7 +300,7 @@ def main():
             all_span = torch.tensor([f.span for f in train_features], dtype=torch.long)
             all_span_3 = torch.tensor([f.span_3 for f in train_features], dtype=torch.long)
         
-        if task_name == "sstphrase":
+        if task_name == "sstphrase" or task_name == "sst-3":
             all_phrase_mask = torch.tensor([f.phrase_mask for f in train_features], dtype=torch.long)
 
         if output_mode == "classification":
@@ -305,7 +308,7 @@ def main():
         elif output_mode == "regression":
             all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.float)
         
-        if task_name == "sstphrase":
+        if task_name == "sstphrase" or task_name == "sst-3":
             train_data = TensorDataset(all_input_ids, all_input_mask, all_phrase_mask, all_segment_ids, all_label_ids, all_span, all_span_3)
         else:
             if (task_name == "sst-2" or task_name == "twitter" or task_name == "emocontext" or task_name == "emoint") and args.para == "sentibert":
@@ -364,7 +367,7 @@ def main():
             nb_tr_examples, nb_tr_steps = 0, 0
             for step, batch in enumerate(tqdm(train_dataloader, desc="Iteration", disable=args.local_rank not in [-1, 0])):
                 batch = tuple(t.to(device) for t in batch)
-                if task_name == "sstphrase":
+                if task_name == "sstphrase" or task_name == "sst-3":
                     input_ids, input_mask, phrase_mask, segment_ids, label_ids, span, span_3 = batch
                     logits, loss = model(input_ids, token_type_ids=segment_ids, attention_mask=input_mask, phrase_mask=phrase_mask, graph_label=label_ids, span=span, span_3=span_3)
                 else:
@@ -379,7 +382,7 @@ def main():
                 if output_mode == "classification":
                     loss_fct = CrossEntropyLoss(ignore_index=-1)
                     loss_tmp = loss_fct(logits.view(-1, num_labels), label_ids.view(-1))
-                    if task_name == "sstphrase" or task_name == "twitter" or task_name == "emocontext" or task_name == "emoint":
+                    if task_name == "sstphrase" or task_name == "sst-3" or task_name == "twitter" or task_name == "emocontext" or task_name == "emoint":
                         print('loss', loss_tmp)
                         
                 elif output_mode == "regression":
@@ -430,7 +433,7 @@ def main():
         # Load a trained model and vocabulary that you have fine-tuned
         finetuned_model_name = [WEIGHTS_NAME_SAVE, CONFIG_NAME_SAVE]
         
-        if task_name == "sstphrase":
+        if task_name == "sstphrase" or task_name == "sst-3":
             model = BertForPhraseClassification.from_pretrained(args.output_dir, finetuned_model_name, num_labels=num_labels)
         else:
             model = BertForSequenceClassification.from_pretrained(args.output_dir, finetuned_model_name, num_labels=num_labels)
@@ -441,7 +444,7 @@ def main():
     else:
         finetuned_model_name = [WEIGHTS_NAME, CONFIG_NAME]
         
-        if task_name == "sstphrase":
+        if task_name == "sstphrase" or task_name == "sst-3":
             model = BertForPhraseClassification.from_pretrained(args.output_dir, finetuned_model_name, num_labels=num_labels)
         else:
             model = BertForSequenceClassification.from_pretrained(args.output_dir, finetuned_model_name, num_labels=num_labels)
@@ -473,7 +476,7 @@ def main():
             #     with open(cached_eval_features_file, "rb") as reader:
             #         eval_features = pickle.load(reader)
             
-            if task_name == "sstphrase":
+            if task_name == "sstphrase" or task_name == "sst-3":
                 eval_features = convert_examples_to_features_phrase(
                         eval_examples, args.max_seq_length, tokenizer, output_mode, "dev", args.data_dir)
             else:
@@ -500,7 +503,7 @@ def main():
             all_span = torch.tensor([f.span for f in eval_features], dtype=torch.long)
             all_span_3 = torch.tensor([f.span_3 for f in eval_features], dtype=torch.long)
             
-        if task_name == "sstphrase":
+        if task_name == "sstphrase" or task_name == "sst-3":
             all_phrase_mask = torch.tensor([f.phrase_mask for f in eval_features], dtype=torch.long)
 
         if output_mode == "classification":
@@ -508,7 +511,7 @@ def main():
         elif output_mode == "regression":
             all_label_ids = torch.tensor([f.label_id for f in eval_features], dtype=torch.float)
         
-        if task_name == "sstphrase":
+        if task_name == "sstphrase" or task_name == "sst-3":
             eval_data = TensorDataset(all_input_ids, all_input_mask, all_phrase_mask, all_segment_ids, all_label_ids, all_span, all_span_3)
         else:
             if (task_name == "sst-2" or task_name == "twitter" or task_name == "emocontext" or task_name == "emoint") and args.para == "sentibert":
@@ -528,7 +531,7 @@ def main():
         preds = []
         out_label_ids = None
         
-        if task_name == "sstphrase":
+        if task_name == "sstphrase" or task_name == "sst-3":
             for input_ids, input_mask, phrase_mask, segment_ids, label_ids, span, span_3 in tqdm(eval_dataloader, desc="Evaluating"):
                 input_ids = input_ids.to(device)
                 input_mask = input_mask.to(device)
@@ -623,12 +626,12 @@ def main():
         eval_loss = eval_loss / nb_eval_steps
         
         pred = preds[0]
-        if task_name == "sstphrase":
+        if task_name == "sstphrase" or task_name == "sst-3":
             pred_ans = []
             for i in pred:
                 pred_ans.append(i)
         if output_mode == "classification":
-            if task_name == "sstphrase":
+            if task_name == "sstphrase" or task_name == "sst-3":
                 preds = np.argmax(pred_ans, axis=-1)
             else:
                 preds = np.argmax(pred, axis=-1)
@@ -640,10 +643,7 @@ def main():
             print(preds.tolist())
             print(out_label_ids.tolist())
             
-        if task_name == "sstphrase":
-            result = compute_metrics(task_name, preds, out_label_ids, pred_ans)
-        else:
-            result = compute_metrics(task_name, preds, out_label_ids)
+        result = compute_metrics(task_name, preds, out_label_ids)
 
         loss = tr_loss/global_step if args.do_train else None
 

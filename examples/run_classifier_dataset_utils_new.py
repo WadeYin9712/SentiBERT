@@ -298,22 +298,70 @@ class SstPhraseProcessor(DataProcessor):
         for line in lines:
             guid = "%s-%s" % (set_type, i)
             text_a = line
-
-            ## need to modify ##
             label = []
             for j in range(len(label_sst[i])):
-                '''if int(label_sst[i][j]) == 0 or int(label_sst[i][j]) == 1:
-                    label.append(0)
-                    # label.append(int(label_sst[i][j]))
-                elif int(label_sst[i][j]) == 3 or int(label_sst[i][j]) == 4:
-                    label.append(1)
-                    # label.append(int(label_sst[i][j]))
-                elif int(label_sst[i][j]) == 2:
-                    label.append(2)
-                    # label.append(int(label_sst[i][j]))
-                else:'''
                 if int(label_sst[i][j]) >= 0 and int(label_sst[i][j]) <= 4:
                     label.append(int(label_sst[i][j]))
+                else:
+                    label.append(-1)
+                    
+            span_tmp = span_sst[i]
+            span_3_tmp = span_sst_3[i]
+
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=None, 
+                             span=span_tmp,
+                             span_3=span_3_tmp,
+                             label=label))
+
+            i += 1    
+            
+        return examples
+    
+class Sst3Processor(DataProcessor):
+    """Processor for the SST-3 data set."""
+
+    def get_train_examples(self, data_dir, para):
+        """See base class."""
+        lines = open(os.path.join(data_dir, "train_text.txt"))
+        graph_label = np.load(os.path.join(data_dir, "sentiment_train.npy"))
+        span = np.load(os.path.join(data_dir, "span_train_new.npy"))
+        span_3 = np.load(os.path.join(data_dir, "span_train_new_3.npy"))
+
+        return self._create_examples(lines, graph_label, span, span_3, "train")
+
+    def get_dev_examples(self, data_dir, para):
+        """See base class."""
+        lines = open(os.path.join(data_dir, "test_text.txt"))
+        graph_label = np.load(os.path.join(data_dir, "sentiment_test.npy"))
+        span = np.load(os.path.join(data_dir, "span_test_new.npy"))
+        span_3 = np.load(os.path.join(data_dir, "span_test_new_3.npy"))
+
+        return self._create_examples(lines, graph_label, span, span_3, "dev")
+
+    def get_labels(self):
+        """See base class."""
+        return ["0", "1", "2"]
+
+    def _create_examples(self, lines, graph_label, span, span_3, set_type):
+        """Creates examples for the training and dev sets."""
+        label_sst = graph_label
+        span_sst = span
+        span_sst_3 = span_3
+
+        examples = []
+        i = 0
+        for line in lines:
+            guid = "%s-%s" % (set_type, i)
+            text_a = line
+            label = []
+            for j in range(len(label_sst[i])):
+                if int(label_sst[i][j]) == 0 or int(label_sst[i][j]) == 1:
+                    label.append(0)
+                elif int(label_sst[i][j]) == 3 or int(label_sst[i][j]) == 4:
+                    label.append(1)
+                elif int(label_sst[i][j]) == 2:
+                    label.append(2)
                 else:
                     label.append(-1)
                     
@@ -745,10 +793,7 @@ def convert_examples_to_features_phrase(examples, max_seq_length,
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
             
         label = example.label
-        span_a = example.span
-        span_a_3 = example.span_3
         tokens_a = tokenizer.tokenize(example.text_a)
-
         tokens_b = None
         # Account for [CLS] and [SEP] with "- 2"
         if len(tokens_a) > max_seq_length - 2:
@@ -780,8 +825,8 @@ def convert_examples_to_features_phrase(examples, max_seq_length,
             segment_ids += [1] * (len(tokens_b) + 1)
 
         input_ids = tokenizer.convert_tokens_to_ids(tokens)
-        span_3, judge, max_new = merge_span(span_a_3, tokens_a, 3)
-        span, judge, max_new = merge_span(span_a, tokens_a, 0)
+        span_3, judge, max_new = merge_span(example.span_3, tokens_a, 3)
+        span, judge, max_new = merge_span(example.span, tokens_a, 0)
         
         if judge == False:
             continue
@@ -966,27 +1011,94 @@ def _truncate_seq_pair(tokens_a, tokens_b, max_length):
 def simple_accuracy(preds, labels):
     return (preds == labels).mean()
 
-def simple_accuracy_phrase(preds, labels, preds_ans):
+def global_swap(sum_stat, cor_stat):
+    cor_split = [0] * 5
+    sum_split = [0] * 5
+    result_2 = []
+    
+    for i in range(5):
+        for j in range(5):
+            if sum_stat[i*5+j] != 0:
+                cor_split[i] += cor_stat[i*5+j]
+                sum_split[i] += sum_stat[i*5+j]
+                
+                
+    for i in range(5):
+        if sum_split[i] != 0:
+            result_2.append(cor_split[i] * 1. / sum_split[i])
+            
+    return result_2
+
+def local_swap(preds, labels, edge_total, edge_swap_total):
+    i = 0
+    edge_swap_stat = [0] * 3
+    edge_swap_sum = [0] * 3
+    for pred in preds:
+        label = labels[i]
+        edge_tot = edge_total[i]
+        edge_swap_tot = edge_swap_total[i]
+        assert len(edge_tot) == len(edge_swap_tot)
+        t2 = 0
+        for edge in edge_tot:
+            if label[edge[0]] == pred[edge[0]]:
+                edge_swap_stat[edge_swap_tot[t2]] += 1
+            edge_swap_sum[edge_swap_tot[t2]] += 1
+            
+            t2 += 1
+        i += 1
+        
+    return [edge_swap_stat[0] * 1. / edge_swap_sum[0], edge_swap_stat[1] * 1. / edge_swap_sum[1], edge_swap_stat[2] * 1. / edge_swap_sum[2]]
+
+def negation(cor_stat_neg, sum_stat_neg):
+    result_4 = []
+            
+    for i in range(3):
+        if i < 2:
+            result_4.append(cor_stat_neg[i] * 1. / sum_stat_neg[i])
+        else:
+            result_4.append((cor_stat_neg[i] + cor_stat_neg[i+1] + cor_stat_neg[i+4]) * 1. / (sum_stat_neg[i] + sum_stat_neg[i+1] + sum_stat_neg[i+4]))
+
+    return result_4
+
+def contrast(labels, but_total, preds):
+    i = 0
+    
+    but_sum = 0
+    but_cor = 0
+    but_tot = 0
+    for pred in preds:
+        but = but_total[i]
+        label = labels[i]
+        
+        if len(but) != 0:
+            but_tot += 1
+            if but[0] >= 0:
+                but_sum += 1
+                if label[but[0]] == pred[but[0]] and label[but[1]] == pred[but[1]] and label[but[2]] == pred[but[2]]:
+                    but_cor += 1
+        i += 1
+        
+    print(but_sum)
+        
+    return but_cor * 1. / but_sum
+
+def simple_accuracy_phrase(preds, labels, task_name):
     tot = 0
     i = 0
     s = 0
     tot_sen = 0
     cor_sen = 0
+    
     swap_total = np.load("swap_test.npy")
     edge_total = np.load("edge_test.npy")
     edge_swap_total = np.load("edge_swap_test.npy")
     but_total = np.load("but_new.npy")
     neg_total = np.load("neg_new.npy")
-    f = open("test_text_new.txt", 'r')
-    text = []
-    for line in f:
-        text.append(line.strip())
+    
     cor_stat = [0] * 128
     sum_stat = [0] * 128
     cor_stat_neg = [0] * 128
     sum_stat_neg = [0] * 128
-    neg = [0] * 128
-    swap = [0] * 128
     
     for pred in preds:
         tot_sen += 1
@@ -1001,123 +1113,53 @@ def simple_accuracy_phrase(preds, labels, preds_ans):
                     tot += 1
                     if pred[j] == labels[i][j]:
                         s += 1
+                
+                if task_name == "sstphrase":
+                    if str(pred[j]) == '0' or str(pred[j]) == '1':
+                        preds[i][j] = 0
+                    if str(pred[j]) == '3' or str(pred[j]) == '4':
+                        preds[i][j] = 1
+                    if str(pred[j]) == '2':
+                        preds[i][j] = 2
+                    if str(labels[i][j]) == '0' or str(labels[i][j]) == '1':
+                        labels[i][j] = 0
+                    if str(labels[i][j]) == '3' or str(labels[i][j]) == '4':
+                        labels[i][j] = 1
+                    if str(labels[i][j]) == '2':
+                        labels[i][j] = 2
                     
-                if str(pred[j]) == '0' or str(pred[j]) == '1':
-                    preds[i][j] = 0
-                if str(pred[j]) == '3' or str(pred[j]) == '4':
-                    preds[i][j] = 1
-                if str(pred[j]) == '2':
-                    preds[i][j] = 2
-                if str(labels[i][j]) == '0' or str(labels[i][j]) == '1':
-                    labels[i][j] = 0
-                if str(labels[i][j]) == '3' or str(labels[i][j]) == '4':
-                    labels[i][j] = 1
-                if str(labels[i][j]) == '2':
-                    labels[i][j] = 2
-        i += 1
-                
-    i = 0
-    for pred in preds:
-        sum_cor = 0
-        label = labels[i]
-        pred_str = ""
-        label_str = ""
-        tot_tmp = 0
-        for j in range(len(pred)):
-            pred_str += str(pred[j]) + ' '
-            label_str += str(label[j]) + ' '
-            if label[j] != -1:
-                tot_tmp += 1
-                if pred[j] == label[j]:
-                    sum_cor += 1
-                    
-        swap[swap_total[i]] += 1
-        cor_stat[swap_total[i]] += sum_cor
-        sum_stat[swap_total[i]] += tot_tmp
-        neg[neg_total[i]] += 1
-        cor_stat_neg[neg_total[i]] += sum_cor
-        sum_stat_neg[neg_total[i]] += tot_tmp
         i += 1
     
-    i = 0
-    edge_swap_stat = [0] * 3
-    edge_swap_sum = [0] * 3
-    for pred in preds:
-        sum_cor = 0
-        label = labels[i]
-        edge_tot = edge_total[i]
-        edge_swap_tot = edge_swap_total[i]
-        assert len(edge_tot) == len(edge_swap_tot)
-        t2 = 0
-        for edge in edge_tot:
-            if label[edge[0]] == pred[edge[0]]:
-                edge_swap_stat[edge_swap_tot[t2]] += 1
-            edge_swap_sum[edge_swap_tot[t2]] += 1
+    if task_name == "sstphrase":            
+        i = 0
+        for pred in preds:
+            sum_cor = 0
+            label = labels[i]
+            tot_tmp = 0
+            for j in range(len(pred)):
+                if label[j] != -1:
+                    tot_tmp += 1
+                    if pred[j] == label[j]:
+                        sum_cor += 1
+                        
+            cor_stat[swap_total[i]] += sum_cor
+            sum_stat[swap_total[i]] += tot_tmp
             
-            t2 += 1
-        i += 1
-    
-    print("swap_local ----------------")
-    print(edge_swap_sum)
-    print(edge_swap_stat[0] * 1. / edge_swap_sum[0], edge_swap_stat[1] * 1. / edge_swap_sum[1], edge_swap_stat[2] * 1. / edge_swap_sum[2])
-    
-    i = 0
-    
-    but_sum = 0
-    but_cor = 0
-    
-    but_tot = 0
-    for pred in preds:
-        but = but_total[i]
-        label = labels[i]
-        
-        if len(but) != 0:
-            but_tot += 1
-            if but[0] >= 0:
-                but_sum += 1
-                if label[but[0]] == pred[but[0]] and label[but[1]] == pred[but[1]] and label[but[2]] == pred[but[2]]:
-                    but_cor += 1
-        i += 1
-        
-    print("but --------------------")
-    print(but)
-    print(but_cor * 1. / but_sum)
-    
-    
-    print('global swap --------------------')
-    print(swap)
-    cor_split = [0] * 5
-    sum_split = [0] * 5
-    
-    for i in range(5):
-        for j in range(5):
-            if sum_stat[i*5+j] != 0:
-                cor_split[i] += cor_stat[i*5+j]
-                sum_split[i] += sum_stat[i*5+j]
-                
-                
-    for i in range(5):
-        if sum_split[i] != 0:
-            print(i, cor_split[i] * 1. / sum_split[i])
-        else:
-            print(i, 0.0)
+            cor_stat_neg[neg_total[i]] += sum_cor
+            sum_stat_neg[neg_total[i]] += tot_tmp
+            i += 1
             
-    print('neg --------------------')
-    print(neg)
-            
-    for i in range(4):
-        if sum_stat_neg[i] != 0:
-            if i != 2:
-                print(i, cor_stat_neg[i] * 1. / sum_stat_neg[i])
-            else:
-                print('2-3', (cor_stat_neg[i] + cor_stat_neg[i+1]) * 1. / (sum_stat_neg[i] + sum_stat_neg[i+1]))
-        else:
-            print(i, 0.0)
+        result_0 = s / tot * 1.0
+        result_1 = cor_sen * 1.0 / tot_sen
+        result_2 = global_swap(sum_stat, cor_stat)
+        result_3 = local_swap(preds, labels, edge_total, edge_swap_total)
+        result_4 = negation(cor_stat_neg, sum_stat_neg)
+        result_5 = contrast(labels, but_total, preds)
         
-    avg = s / tot * 1.0
-    
-    print('sst-5:', cor_sen * 1.0 / tot_sen)
-    return avg
+        return [result_0, result_1, result_2, result_3, result_4, result_5]
+    else:
+        return cor_sen * 1.0 / tot_sen
+        
 
 def acc_and_f1(preds, labels):
     acc = simple_accuracy(preds, labels)
@@ -1164,11 +1206,8 @@ def micro_f1(preds, labels):
 
 def pearson_and_spearman(preds, labels):                      
     pearson_corr = pearsonr(preds, labels)[0]
-    spearman_corr = spearmanr(preds, labels)[0]
     return {
         "pearson": pearson_corr,
-        "spearmanr": spearman_corr,
-        "corr": (pearson_corr + spearman_corr) / 2,
     }
 
 
@@ -1178,8 +1217,11 @@ def compute_metrics(task_name, preds, labels, preds_ans=None):
         return {"mcc": matthews_corrcoef(labels, preds)}
     elif task_name == "sst-2":
         return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "sst-3":
+        return {"acc": simple_accuracy_phrase(preds, labels, task_name)}
     elif task_name == "sstphrase":
-        return {"acc": simple_accuracy_phrase(preds, labels, preds_ans)}
+        result = simple_accuracy_phrase(preds, labels, task_name)
+        return {"phrase_acc": result[0], "sst-5_acc": result[1], "global_swap_acc": result[2], "local_swap_acc": result[3], "neg_acc": result[4], "but_acc": result[5]}
     elif task_name == "mrpc":
         return acc_and_f1(preds, labels)
     elif task_name == "sts-b":
@@ -1211,6 +1253,7 @@ processors = {
     "mnli-mm": MnliMismatchedProcessor,
     "mrpc": MrpcProcessor,
     "sst-2": Sst2Processor,
+    "sst-3": Sst3Processor,
     "sstphrase": SstPhraseProcessor,
     "sts-b": StsbProcessor,
     "qqp": QqpProcessor,
@@ -1227,6 +1270,7 @@ output_modes = {
     "mnli": "classification",
     "mrpc": "classification",
     "sst-2": "classification",
+    "sst-3": "classification",
     "sstphrase": "classification",
     "sts-b": "regression",
     "qqp": "classification",
