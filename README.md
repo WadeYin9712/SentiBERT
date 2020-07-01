@@ -16,7 +16,7 @@ https://arxiv.org/abs/2005.04114
 * NVIDIA GeForce GTX 1080 Ti
 * HuggingFaces Pytorch (also known as pytorch-pretrained-bert & transformers)
 * Stanford CoreNLP (stanford-corenlp-full-2018-10-05)
-* Numpy, Pickle, Tqdm, Scipy, etc. (See requirement.txt)
+* Numpy, Pickle, Tqdm, Scipy, etc. (See requirements.txt)
 ```
 
 ### Datasets
@@ -33,12 +33,13 @@ Datasets include:
 
 ### File Architecture (Selected important files)
 ```
--- /examples/run_classifier_new.py                                  ---> start to run
+-- /examples/run_classifier_new.py                                  ---> start to train
 -- /examples/run_classifier_dataset_utils_new.py                    ---> input preprocessed files to SentiBERT
 -- /pytorch-pretrained-bert/modeling_new.py                         ---> detailed model architecture
 -- /examples/lm_finetuning/pregenerate_training_data_sstphrase.py   ---> generate pretrained epoches
 -- /examples/lm_finetuning/finetune_on_pregenerated_sstphrase.py    ---> pretrain on generated epoches
--- /stanford-corenlp-full-2018-10-05/xxx_st.py (under construction) ---> preprocess raw text and constituency tree
+-- /preprocessing/xxx_st.py                                         ---> preprocess raw text and constituency tree
+-- /datasets                                                        ---> datasets
 -- /transformers (under construction)                               ---> RoBERTa part
 ```
 
@@ -47,30 +48,34 @@ Datasets include:
 ```
 pip install -r requirements.txt
 
+wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
+unzip http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
+
 export PYTHONPATH=$PYTHONPATH:XX/SentiBERT/
 export PYTHONPATH=$PYTHONPATH:XX/
 ```
 ### Preprocessing
-1. Split the raw text and golden labels of sentiment/emotion datasets by yourselves into `xxx_train\dev\test_text.txt` and `xxx_train\dev\test_label.npy`, assuming that `xxx` represents task name.
-2. Put the files into `/stanford-corenlp-full-2018-10-05/`. To get binary sentiment constituency trees, run
+1. Split the raw text and golden labels of sentiment/emotion datasets by yourselves into `xxx_train\dev\test\.txt` and `xxx_train\dev\test_label.npy`, assuming that `xxx` represents task name.
+2. Put the files into `xxx_train\dev\test.txt` files into `/stanford-corenlp-full-2018-10-05/`. To get binary sentiment constituency trees, run
 ```
 java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,parse,sentiment -file xxx_train\dev\test_text.txt -outputFormat json -ssplit.eolonly true -tokenize.whitespace true
 ```
-The tree information will be stored in `/stanford-corenlp-full-2018-10-05/xxx_train\dev\test_text.txt.json`.
-3. Run `/glue_data/xxx/xxx_st.py` to clean, and store the text and label information in `xxx_train\dev\test_text_new.txt` and `xxx_label_train\dev\test.npy`. It also transforms the tree structure into matrices `/glue_data/xxx/xxx_train\dev\test_span.npy` and `/glue_data/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as the range of constituencies in the first layer of our attention mechanism. The second matrix is used as the indices of each constituency's children nodes or subwords and itself in the second layer. Specifically, the command is like below:
+The tree information will be stored in `/stanford-corenlp-full-2018-10-05/xxx_train\dev\test.txt.json`.
+3. Run `/datasets/xxx/xxx_st.py` to clean, and store the text and label information in `xxx_train\dev\test_text_new.txt` and `xxx_label_train\dev\test.npy`. It also transforms the tree structure into matrices `/datasets/xxx/xxx_train\dev\test_span.npy` and `/datasets/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as the range of constituencies in the first layer of our attention mechanism. The second matrix is used as the indices of each constituency's children nodes or subwords and itself in the second layer. Specifically, the command is like below:
 ```
 python xxx_st.py \
-        --data_dir /glue_data/xxx/ \                        ---> the location where you want to store preprocessed text, label and tree information 
+        --data_dir /datasets/xxx/ \                        ---> the location where you want to store preprocessed text, label and tree information 
         --tree_dir /stanford-corenlp-full-2018-10-05/ \     ---> the location of unpreprocessed tree information (usually in Stanford CoreNLP repo)
         --stage train \                                     ---> "train", "test" or "dev"
         --domain joy                                        ---> "joy", "sad", "fear" or "anger". Used in EmoInt task
 ```
+Note that SST-phrase already has tree information in `sstphrase_train\dev\test.txt`. In this case, tree_dir should be `/datasets/sstphrase/`.
 
 ## Pretraining
 1. Generate epoches for preparation
 ```
 python3 pregenerate_training_data_sstphrase.py \
-        --train_corpus /glue_data/sstphrase/sstphrase_train_text_new.txt \
+        --train_corpus /datasets/sstphrase/sstphrase_train_text_new.txt \
         --bert_model bert-base-uncased \
         --do_lower_case \
         --output_dir /training_sstphrase \
@@ -96,7 +101,7 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
   --do_train \
   --do_eval \
   --do_lower_case \
-  --data_dir /glue_data/xxx \                    ---> the same name as task_name
+  --data_dir /datasets/xxx \                    ---> the same name as task_name
   --bert_model bert-base-uncased \
   --max_seq_length 128 \
   --train_batch_size xxx \
@@ -277,10 +282,10 @@ Here we provide analysis implementation in our paper. We will focus on the evalu
 
 In preprocessing part, we provide implementation to extract related information in the test set of SST-phrase and store them in 
 ```
--- /glue_data/sstphrase/swap_test_new.npy                   ---> global difficulty
--- /glue_data/sstphrase/edge_swap_test_new.npy              ---> local difficulty
--- /glue_data/sstphrase/neg_new.npy                         ---> negation
--- /glue_data/sstphrase/but_new.npy                         ---> contrastive relation
+-- /datasets/sstphrase/swap_test_new.npy                   ---> global difficulty
+-- /datasets/sstphrase/edge_swap_test_new.npy              ---> local difficulty
+-- /datasets/sstphrase/neg_new.npy                         ---> negation
+-- /datasets/sstphrase/but_new.npy                         ---> contrastive relation
 ```
 In `simple_accuracy_phrase()`, we will provide statistical details and evaluate for each metric.
 
