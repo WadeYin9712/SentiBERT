@@ -50,19 +50,27 @@ pip install -r requirements.txt
 export PYTHONPATH=$PYTHONPATH:XX/SentiBERT/
 export PYTHONPATH=$PYTHONPATH:XX/
 ```
-### Preprocessing (under construction)
-1. Split the raw text and golden labels of sentiment/emotion datasets by yourselves into `xxx_train\dev\test_text.txt` and `xxx_label_train\dev\test.npy`, assuming that `xxx` represents task name.
-2. Put the files into `/stanford-corenlp-full-2018-10-05/`. To get binary constituency trees, run
+### Preprocessing
+1. Split the raw text and golden labels of sentiment/emotion datasets by yourselves into `xxx_train\dev\test_text.txt` and `xxx_train\dev\test_label.npy`, assuming that `xxx` represents task name.
+2. Put the files into `/stanford-corenlp-full-2018-10-05/`. To get binary sentiment constituency trees, run
 ```
 java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,parse,sentiment -file xxx_train\dev\test_text.txt -outputFormat json -ssplit.eolonly true -tokenize.whitespace true
 ```
-3. Run `/stanford-corenlp-full-2018-10-05/xxx_st.py` to transform the tree structure into matrices `/glue_data/xxx/xxx_train\dev\test_span.npy` and `/glue_data/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as mask in the first layer of our attention mechanism. The second matrix is used as mask in the second layer.
+The tree information will be stored in `/stanford-corenlp-full-2018-10-05/xxx_train\dev\test_text.txt.json`.
+3. Run `/glue_data/xxx/xxx_st.py` to clean, and store the text and label information in `xxx_train\dev\test_text_new.txt` and `xxx_label_train\dev\test.npy`. It also transforms the tree structure into matrices `/glue_data/xxx/xxx_train\dev\test_span.npy` and `/glue_data/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as the range of constituencies in the first layer of our attention mechanism. The second matrix is used as the indices of each constituency's children nodes or subwords and itself in the second layer. Specifically, the command is like below:
+```
+python xxx_st.py \
+        --data_dir /glue_data/xxx/ \                        ---> the location where you want to store preprocessed text, label and tree information 
+        --tree_dir /stanford-corenlp-full-2018-10-05/ \     ---> the location of unpreprocessed tree information (usually in Stanford CoreNLP repo)
+        --stage train \                                     ---> "train", "test" or "dev"
+        --domain joy                                        ---> "joy", "sad", "fear" or "anger". Used in EmoInt task
+```
 
 ## Pretraining
 1. Generate epoches for preparation
 ```
 python3 pregenerate_training_data_sstphrase.py \
-        --train_corpus /glue_data/sstphrase/sstphrase_train_text.txt \
+        --train_corpus /glue_data/sstphrase/sstphrase_train_text_new.txt \
         --bert_model bert-base-uncased \
         --do_lower_case \
         --output_dir /training_sstphrase \
@@ -78,7 +86,7 @@ CUDA_VISIBLE_DEVICES=7 python3 finetune_on_pregenerated_sstphrase.py \
         --output_dir /results/sstphrase_pretrain \
         --epochs 3
 ```
-The pre-trained parameters were released here. [[Google Drive]](https://drive.google.com/file/d/1VPKeB_FjrAiSYfEi-F72wtZkaYQD-l7Q/view?usp=sharing)
+The pre-trained parameters were released here. [[Google Drive]](https://drive.google.com/file/d/1YjQxMfTQV14LSu3-I7br3vmP71ojjPsQ/view?usp=sharing)
 
 ## Fine-tuning 
 Run run_classifier_new.py directly as follows:
@@ -102,20 +110,20 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
 
 ## Checkpoints
 For reproducity and usability, we provide checkpoints and the original training settings to help you reproduce:
- * SST-phrase [[Google Drive]](https://drive.google.com/file/d/17if73T2bbOhAqG41RxkJ7HxfusUjm-hg/view?usp=sharing)
- * SST-5 [[Google Drive]](https://drive.google.com/file/d/17if73T2bbOhAqG41RxkJ7HxfusUjm-hg/view?usp=sharing)
- * SST-2 [[Google Drive]](https://drive.google.com/file/d/1JiPv5Wv56A6JccgLBS_-1LSFna63iL5T/view?usp=sharing)
- * SST-3 [[Google Drive]](https://drive.google.com/file/d/1XsmcGyotHfVABaewxY_EcESR7Dku66Ln/view?usp=sharing)
- * EmoContext [[Google Drive]](https://drive.google.com/file/d/1rpO5rmBY6rX6rbZuyCoGV40J0JpcPo2x/view?usp=sharing)
+ * SST-phrase [[Google Drive]](https://drive.google.com/file/d/1bGadvbVTJ3tVvKCy_U05OfbZ9OdsJjQV/view?usp=sharing)
+ * SST-5 [[Google Drive]](https://drive.google.com/file/d/1bGadvbVTJ3tVvKCy_U05OfbZ9OdsJjQV/view?usp=sharing)
+ * SST-2 [[Google Drive]](https://drive.google.com/file/d/1r1QPiWXuvf4epVLor2RPD9nbEo5S__Rz/view?usp=sharing)
+ * SST-3 [[Google Drive]](https://drive.google.com/file/d/1QwLc_y91TRKhApTb5bI-Ew_6Ut5Frca1/view?usp=sharing)
+ * EmoContext [[Google Drive]](https://drive.google.com/file/d/1lWynwK3RqPvaNTbBRVlbFnMk-KYm5XlY/view?usp=sharing)
  * EmoInt:
-     * Joy [[Google Drive]](https://drive.google.com/file/d/1OTGBRlcWISzH2bl2aKs9YMN2XQKJ9bJj/view?usp=sharing)
-     * Fear [[Google Drive]](https://drive.google.com/file/d/1b8db93qOOpSMJjSRI1pJUumdRS4X83Xg/view?usp=sharing)
-     * Sad [[Google Drive]](https://drive.google.com/file/d/1En9Vcn1JdG8NyxfuQbUCSaToSpUu8Oxp/view?usp=sharing)
-     * Anger [[Google Drive]](https://drive.google.com/file/d/1vm0cSyqTbm41qe_bVtVGkt0mSYTsdQko/view?usp=sharing)
- * Twitter Sentiment Analysis [[Google Drive]](https://drive.google.com/file/d/16CQh9WdqhzeWfkxToZholnOqmaNEnayG/view?usp=sharing)
+     * Joy [[Google Drive]](https://drive.google.com/file/d/1hihlFan3nT0ywKTt7jJyH0x5Ppt2-RVc/view?usp=sharing)
+     * Fear [[Google Drive]](https://drive.google.com/file/d/1dEO-fi7g-Hg-5ukou3vlsErZTHJ-0QuQ/view?usp=sharing)
+     * Sad [[Google Drive]](https://drive.google.com/file/d/1ESwLbWHKOj36RC2Bl2bhYs28bYPWlrlI/view?usp=sharing)
+     * Anger [[Google Drive]](https://drive.google.com/file/d/19JRvifGQDf59oZECErFDwctQ_zU8JWqi/view?usp=sharing)
+ * Twitter Sentiment Analysis [[Google Drive]](https://drive.google.com/file/d/10YtL0R0Kk9ZVw7gX56xM31QjTWF0XP9X/view?usp=sharing)
 
 The implementation details and results are shown below:
-**Note: BERT* denotes BERT w/ Mean pooling.**
+**Note: BERT* denotes BERT w/ Mean pooling. The results of subtasks in EmoInt is (Joy: 68.90, 65.18, 4 epochs), (Anger: 68.17, 66.73, 4 epochs), (Sad: 66.25, 63.08, 5 epochs), (Fear: 65.49, 64.79, 5 epochs), respectively.**
 <table>
   <tr>
     <th>Models</th>
@@ -134,7 +142,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">5</td>
     <td class="tg-0pky">30</td>
-    <td class="tg-0pky">**68.89**</td>
+    <td class="tg-0pky">**68.98**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT*</td>
@@ -142,7 +150,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">5</td>
     <td class="tg-0pky">30</td>
-    <td class="tg-0pky">64.76</td>
+    <td class="tg-0pky">65.22</td>
   </tr>
   <tr>
     <td class="tg-baqh" colspan="6">SST-5</td>
@@ -153,7 +161,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">5</td>
     <td class="tg-0pky">30</td>
-    <td class="tg-0pky">**56.64**</td>
+    <td class="tg-0pky">**56.04**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT*</td>
@@ -161,7 +169,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">5</td>
     <td class="tg-0pky">30</td>
-    <td class="tg-0pky">49.13</td>
+    <td class="tg-0pky">50.23</td>
   </tr>
   <tr>
     <td class="tg-baqh" colspan="6">SST-2</td>
@@ -172,7 +180,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">1</td>
     <td class="tg-0pky">30</td>
-    <td class="tg-0pky">**93.02**</td>
+    <td class="tg-0pky">**93.25**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT</td>
@@ -191,7 +199,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">5</td>
     <td class="tg-0pky">77</td>
-    <td class="tg-0pky">**77.84**</td>
+    <td class="tg-0pky">**77.34**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT*</td>
@@ -210,7 +218,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">1</td>
     <td class="tg-0pky">0</td>
-    <td class="tg-0pky">**75.85**</td>
+    <td class="tg-0pky">**74.47**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT</td>
@@ -229,7 +237,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">4 or 5</td>
     <td class="tg-0pky">77</td>
-    <td class="tg-0pky">**67.24**</td>
+    <td class="tg-0pky">**67.20**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT</td>
@@ -237,7 +245,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">4 or 5</td>
     <td class="tg-0pky">77</td>
-    <td class="tg-0pky">64.79</td>
+    <td class="tg-0pky">64.95</td>
   </tr>
   <tr>
     <td class="tg-baqh" colspan="6">Twitter Sentiment Analysis</td>
@@ -248,7 +256,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">6e-5</td>
     <td class="tg-0pky">1</td>
     <td class="tg-0pky">45</td>
-    <td class="tg-0pky">**70.1**</td>
+    <td class="tg-0pky">**70.2**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT</td>
@@ -287,33 +295,33 @@ Some of the analysis results based on our provided checkpoints are selected and 
   </tr>
   <tr>
     <td class="tg-0pky">SentiBERT</td>
-    <td class="tg-0pky">**[85.41, 60.69, 49.03]**</td>
+    <td class="tg-0pky">**[85.39, 60.80, 49.40]**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT*</td>
-    <td class="tg-0pky">[82.42, 55.64, 32.19]</td>
+    <td class="tg-0pky">[83.00, 55.54, 31.97]</td>
   </tr>
   <tr>
     <td class="tg-c3ow" colspan="2">Negation</td>
   </tr>
   <tr>
     <td class="tg-0pky">SentiBERT</td>
-    <td class="tg-0pky">**[78.34, 76.30, 72.77]**</td>
+    <td class="tg-0pky">**[78.45, 76.25, 70.56]**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT*</td>
-    <td class="tg-0pky">[74.55, 71.36, 69.72]</td>
+    <td class="tg-0pky">[75.04, 71.40, 68.77]</td>
   </tr>
   <tr>
     <td class="tg-c3ow" colspan="2">Contrastive Relation</td>
   </tr>
   <tr>
     <td class="tg-0pky">SentiBERT</td>
-    <td class="tg-0pky">**39.24**</td>
+    <td class="tg-0pky">**39.87**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT*</td>
-    <td class="tg-0pky">27.85</td>
+    <td class="tg-0pky">28.48</td>
   </tr>
 </table>
 
