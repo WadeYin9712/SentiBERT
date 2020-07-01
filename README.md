@@ -4,7 +4,7 @@ https://arxiv.org/abs/2005.04114
 
 ## Model Architecture
 <p align="center">
-    <img src="model.png" height="300" />
+    <img src="model.png" height="300"/>
 </p> 
 
 ## Requirements
@@ -55,7 +55,7 @@ export PYTHONPATH=$PYTHONPATH:XX/SentiBERT/
 export PYTHONPATH=$PYTHONPATH:XX/
 ```
 ### Preprocessing
-1. Split the raw text and golden labels of sentiment/emotion datasets by yourselves into `xxx_train\dev\test\.txt` and `xxx_train\dev\test_label.npy`, assuming that `xxx` represents task name.
+1. Split the raw text and golden labels of sentiment/emotion datasets into `xxx_train\dev\test.txt` and `xxx_train\dev\test_label.npy`, assuming that `xxx` represents task name.
 2. Put the files into `xxx_train\dev\test.txt` files into `/stanford-corenlp-full-2018-10-05/`. To get binary sentiment constituency trees, run
 ```
 java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,parse,sentiment -file xxx_train\dev\test_text.txt -outputFormat json -ssplit.eolonly true -tokenize.whitespace true
@@ -64,7 +64,7 @@ The tree information will be stored in `/stanford-corenlp-full-2018-10-05/xxx_tr
 3. Run `/datasets/xxx/xxx_st.py` to clean, and store the text and label information in `xxx_train\dev\test_text_new.txt` and `xxx_label_train\dev\test.npy`. It also transforms the tree structure into matrices `/datasets/xxx/xxx_train\dev\test_span.npy` and `/datasets/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as the range of constituencies in the first layer of our attention mechanism. The second matrix is used as the indices of each constituency's children nodes or subwords and itself in the second layer. Specifically, the command is like below:
 ```
 python xxx_st.py \
-        --data_dir /datasets/xxx/ \                        ---> the location where you want to store preprocessed text, label and tree information 
+        --data_dir /datasets/xxx/ \                         ---> the location where you want to store preprocessed text, label and tree information 
         --tree_dir /stanford-corenlp-full-2018-10-05/ \     ---> the location of unpreprocessed tree information (usually in Stanford CoreNLP repo)
         --stage train \                                     ---> "train", "test" or "dev"
         --domain joy                                        ---> "joy", "sad", "fear" or "anger". Used in EmoInt task
@@ -72,7 +72,7 @@ python xxx_st.py \
 Note that SST-phrase already has tree information in `sstphrase_train\dev\test.txt`. In this case, tree_dir should be `/datasets/sstphrase/`.
 
 ## Pretraining
-1. Generate epoches for preparation
+1. Generate epochs for preparation
 ```
 python3 pregenerate_training_data_sstphrase.py \
         --train_corpus /datasets/sstphrase/sstphrase_train_text_new.txt \
@@ -82,7 +82,7 @@ python3 pregenerate_training_data_sstphrase.py \
         --epochs_to_generate 3 \
         --max_seq_len 128 \
 ```
-2. Pretrain the generated epoches
+2. Pretrain the generated epochs
 ```
 CUDA_VISIBLE_DEVICES=7 python3 finetune_on_pregenerated_sstphrase.py \
         --pregenerated_data /training_sstphrase \
@@ -101,7 +101,7 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
   --do_train \
   --do_eval \
   --do_lower_case \
-  --data_dir /datasets/xxx \                    ---> the same name as task_name
+  --data_dir /datasets/xxx \                     ---> the same name as task_name
   --bert_model bert-base-uncased \
   --max_seq_length 128 \
   --train_batch_size xxx \
@@ -110,7 +110,7 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
   --domain xxx \                                 ---> "joy", "sad", "fear" or "anger". Used in EmoInt task
   --output_dir /results/xxx \                    ---> the same name as task_name
   --seed xxx \
-  --para xxx                                     ---> "SentiBERT" or "BERT": pretrained SentiBERT or BERT
+  --para xxx                                     ---> "sentibert" or "bert": pretrained SentiBERT or BERT
 ```
 
 ## Checkpoints
@@ -212,7 +212,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">5</td>
     <td class="tg-0pky">77</td>
-    <td class="tg-0pky">72.71</td>
+    <td class="tg-0pky">73.72</td>
   </tr>
   <tr>
     <td class="tg-baqh" colspan="6">EmoContext</td>
