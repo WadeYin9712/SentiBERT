@@ -11,6 +11,7 @@ import numpy as np
 import json
 import collections
 import pickle as pkl
+import os
 
 np.random.seed(11456)
 random.seed(11456)
@@ -498,6 +499,7 @@ def build_graph(graph_line, corre, normal, iter_num):
 def main():
     parser = ArgumentParser()
     parser.add_argument('--train_corpus', type=Path, required=True)
+    parser.add_argument("--data_dir", type=Path, required=True)
     parser.add_argument("--output_dir", type=Path, required=True)
     parser.add_argument("--bert_model", type=str, required=True,
                         choices=["bert-base-uncased", "bert-large-uncased", "bert-base-cased",
@@ -523,12 +525,11 @@ def main():
     preprocessed = True
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
     vocab_list = list(tokenizer.vocab.keys())
-    span = np.load("/local/harold/backup_code_wade/pytorch-pretrained-BERT/glue_data/sstphrase/span_train_new.npy")
+    span = np.load(os.path.join(args.data_dir, "sstphrase_train_span.npy"))
     span = span.tolist()
-    span_3 = np.load("/local/harold/backup_code_wade/pytorch-pretrained-BERT/glue_data/sstphrase/span_train_new_3.npy")
+    span_3 = np.load(os.path.join(args.data_dir, "sstphrase_train_span_3.npy"))
     span_3 = span_3.tolist()
-    print('span:', len(span))
-    sentiment_label = np.load("/local/harold/backup_code_wade/pytorch-pretrained-BERT/glue_data/sstphrase/sentiment_train.npy")
+    sentiment_label = np.load(os.path.join(args.data_dir, "sstphrase_label_train.npy"))
     sentiwordnet = open("SentiWordNet_3.0.0.txt", 'r')
     
     flag = 0
