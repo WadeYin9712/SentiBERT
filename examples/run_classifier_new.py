@@ -419,6 +419,8 @@ def main():
     ### Saving best-practices: if you use defaults names for the model, you can reload it using from_pretrained()
     ### Example:
     tokenizer = BertTokenizer.from_pretrained(args.bert_model, do_lower_case=args.do_lower_case)
+    finetuned_model_name = [WEIGHTS_NAME_SAVE, CONFIG_NAME_SAVE]
+    
     if args.do_train and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
         # Save a trained model, configuration and tokenizer
         model_to_save = model.module if hasattr(model, 'module') else model  # Only save the model it-self
@@ -431,7 +433,6 @@ def main():
         model_to_save.config.to_json_file(output_config_file)
         tokenizer.save_vocabulary(args.output_dir)
         # Load a trained model and vocabulary that you have fine-tuned
-        finetuned_model_name = [WEIGHTS_NAME_SAVE, CONFIG_NAME_SAVE]
         
         if task_name == "sstphrase" or task_name == "sst-3":
             model = BertForPhraseClassification.from_pretrained(args.output_dir, finetuned_model_name, num_labels=num_labels)
@@ -442,8 +443,6 @@ def main():
         output_args_file = os.path.join(args.output_dir, 'training_args.bin')
         torch.save(args, output_args_file)
     else:
-        finetuned_model_name = [WEIGHTS_NAME, CONFIG_NAME]
-        
         if task_name == "sstphrase" or task_name == "sst-3":
             model = BertForPhraseClassification.from_pretrained(args.output_dir, finetuned_model_name, num_labels=num_labels)
         else:

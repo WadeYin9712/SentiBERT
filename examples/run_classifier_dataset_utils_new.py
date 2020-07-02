@@ -267,19 +267,19 @@ class SstPhraseProcessor(DataProcessor):
 
     def get_train_examples(self, data_dir, para):
         """See base class."""
-        lines = open(os.path.join(data_dir, "train_text.txt"))
-        graph_label = np.load(os.path.join(data_dir, "sentiment_train.npy"))
-        span = np.load(os.path.join(data_dir, "span_train_new.npy"))
-        span_3 = np.load(os.path.join(data_dir, "span_train_new_3.npy"))
+        lines = open(os.path.join(data_dir, "sstphrase_train_text_new.txt"))
+        graph_label = np.load(os.path.join(data_dir, "sstphrase_label_train.npy"))
+        span = np.load(os.path.join(data_dir, "sstphrase_train_span.npy"))
+        span_3 = np.load(os.path.join(data_dir, "sstphrase_train_span_3.npy"))
 
         return self._create_examples(lines, graph_label, span, span_3, "train")
 
     def get_dev_examples(self, data_dir, para):
         """See base class."""
-        lines = open(os.path.join(data_dir, "test_text.txt"))
-        graph_label = np.load(os.path.join(data_dir, "sentiment_test.npy"))
-        span = np.load(os.path.join(data_dir, "span_test_new.npy"))
-        span_3 = np.load(os.path.join(data_dir, "span_test_new_3.npy"))
+        lines = open(os.path.join(data_dir, "sstphrase_test_text_new.txt"))
+        graph_label = np.load(os.path.join(data_dir, "sstphrase_label_test.npy"))
+        span = np.load(os.path.join(data_dir, "sstphrase_test_span.npy"))
+        span_3 = np.load(os.path.join(data_dir, "sstphrase_test_span_3.npy"))
 
         return self._create_examples(lines, graph_label, span, span_3, "dev")
 
@@ -323,19 +323,19 @@ class Sst3Processor(DataProcessor):
 
     def get_train_examples(self, data_dir, para):
         """See base class."""
-        lines = open(os.path.join(data_dir, "train_text.txt"))
-        graph_label = np.load(os.path.join(data_dir, "sentiment_train.npy"))
-        span = np.load(os.path.join(data_dir, "span_train_new.npy"))
-        span_3 = np.load(os.path.join(data_dir, "span_train_new_3.npy"))
+        lines = open(os.path.join(data_dir, "sstphrase_train_text_new.txt"))
+        graph_label = np.load(os.path.join(data_dir, "sstphrase_label_train.npy"))
+        span = np.load(os.path.join(data_dir, "sstphrase_train_span.npy"))
+        span_3 = np.load(os.path.join(data_dir, "sstphrase_train_span_3.npy"))
 
         return self._create_examples(lines, graph_label, span, span_3, "train")
 
     def get_dev_examples(self, data_dir, para):
         """See base class."""
-        lines = open(os.path.join(data_dir, "test_text.txt"))
-        graph_label = np.load(os.path.join(data_dir, "sentiment_test.npy"))
-        span = np.load(os.path.join(data_dir, "span_test_new.npy"))
-        span_3 = np.load(os.path.join(data_dir, "span_test_new_3.npy"))
+        lines = open(os.path.join(data_dir, "sstphrase_test_text_new.txt"))
+        graph_label = np.load(os.path.join(data_dir, "sstphrase_label_test.npy"))
+        span = np.load(os.path.join(data_dir, "sstphrase_test_span.npy"))
+        span_3 = np.load(os.path.join(data_dir, "sstphrase_test_span_3.npy"))
 
         return self._create_examples(lines, graph_label, span, span_3, "dev")
 
