@@ -927,7 +927,7 @@ class BertModel(BertPreTrainedModel):
             encoded_layers_trans = self.trans(encoded_layers)
             graph_output_tmp = torch.bmm(span_mask, encoded_layers_trans) * 1. / num.unsqueeze(-1)
             graph_output = graph_output_tmp
-            weights = self.bahdanau_attention(graph_output_tmp, encoded_layers_trans)
+            '''weights = self.bahdanau_attention(graph_output_tmp, encoded_layers_trans)
             weights = extended_span_mask + weights
             weights = self.softmax(weights)
             graph_output = torch.bmm(weights, encoded_layers_trans)
@@ -942,7 +942,7 @@ class BertModel(BertPreTrainedModel):
             graph_output_3 = torch.bmm(weights_3, concat_encoded_layers_trans_3)
             graph_output_3 = self.linear_out_3(torch.cat([graph_output, graph_output_3], -1))
             graph_output = self.LayerNorm(gelu(self.trans_2(graph_output_3)))
-            graph_output = self.LayerNorm(gelu(self.trans_3(graph_output)))
+            graph_output = self.LayerNorm(gelu(self.trans_3(graph_output)))'''
             
         return graph_output
 
