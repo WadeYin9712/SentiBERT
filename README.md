@@ -56,11 +56,18 @@ export PYTHONPATH=$PYTHONPATH:XX/
 ```
 ### Preprocessing
 1. Split the raw text and golden labels of sentiment/emotion datasets into `xxx_train\dev\test.txt` and `xxx_train\dev\test_label.npy`, assuming that `xxx` represents task name.
-2. Put the files into `xxx_train\dev\test.txt` files into `/stanford-corenlp-full-2018-10-05/`. To get binary sentiment constituency trees, run
+2. Put the files into `xxx_train\dev\test.txt` files into `/stanford-corenlp-full-2018-10-05/`. Except **SST-phrase**, **SST-2,3,5**, to get binary sentiment constituency trees, please run
 ```
-java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,parse,sentiment -file xxx_train\dev\test_text.txt -outputFormat json -ssplit.eolonly true -tokenize.whitespace true
+java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,parse,sentiment -file xxx_train\test.txt -outputFormat json -ssplit.eolonly true -tokenize.whitespace true
 ```
 The tree information will be stored in `/stanford-corenlp-full-2018-10-05/xxx_train\dev\test.txt.json`.
+Note that for **SST-2**, please use
+```
+java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,parse,sentiment -file sst2_train\dev_text.txt -outputFormat json -ssplit.eolonly true
+```
+The tree information will be stored in `/stanford-corenlp-full-2018-10-05/sst2_train\dev\test_text.txt.json`.
+For **SST-phrase** and **SST-3,5**, the tree information was already stored in `sstphrase_train\test.txt`.
+
 3. Run `/datasets/xxx/xxx_st.py` to clean, and store the text and label information in `xxx_train\dev\test_text_new.txt` and `xxx_label_train\dev\test.npy`. It also transforms the tree structure into matrices `/datasets/xxx/xxx_train\dev\test_span.npy` and `/datasets/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as the range of constituencies in the first layer of our attention mechanism. The second matrix is used as the indices of each constituency's children nodes or subwords and itself in the second layer. Specifically, the command is like below:
 ```
 python xxx_st.py \
@@ -69,7 +76,7 @@ python xxx_st.py \
         --stage train \                                     ---> "train", "test" or "dev"
         --domain joy                                        ---> "joy", "sad", "fear" or "anger". Used in EmoInt task
 ```
-Note that SST-phrase already has tree information in `sstphrase_train\dev\test.txt`. In this case, tree_dir should be `/datasets/sstphrase/`.
+Note that SST-phrase already has tree information in `sstphrase_train\test.txt`. In this case, tree_dir should be `/datasets/sstphrase/`.
 
 ## Pretraining
 1. Generate epochs for preparation
@@ -184,15 +191,15 @@ The implementation details and results are shown below:
     <td class="tg-0pky">32</td>
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">1</td>
-    <td class="tg-0pky">30</td>
-    <td class="tg-0pky">**93.25**</td>
+    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">**92.55**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT</td>
     <td class="tg-0pky">32</td>
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">1</td>
-    <td class="tg-0pky">30</td>
+    <td class="tg-0pky">77</td>
     <td class="tg-0pky">92.08</td>
   </tr>
   <tr>
