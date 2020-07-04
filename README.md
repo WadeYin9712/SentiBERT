@@ -141,19 +141,19 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
 For reproducity and usability, we provide checkpoints and the original training settings to help you reproduce:
  * SST-phrase [[Google Drive]](https://drive.google.com/file/d/1bGadvbVTJ3tVvKCy_U05OfbZ9OdsJjQV/view?usp=sharing)
  * SST-5 [[Google Drive]](https://drive.google.com/file/d/1bGadvbVTJ3tVvKCy_U05OfbZ9OdsJjQV/view?usp=sharing)
- * SST-2 [[Google Drive]](https://drive.google.com/file/d/1CV29HU1TNH1lGYjankZfyGlsmuL8Sfsa/view?usp=sharing)
+ * SST-2 [[Google Drive]](https://drive.google.com/file/d/1r1QPiWXuvf4epVLor2RPD9nbEo5S__Rz/view?usp=sharing)
  * SST-3 [[Google Drive]](https://drive.google.com/file/d/1QwLc_y91TRKhApTb5bI-Ew_6Ut5Frca1/view?usp=sharing)
- * EmoContext [[Google Drive]](https://drive.google.com/file/d/1jNQ_bgehbn-X5xezReh-5y2jLGOUY1a4/view?usp=sharing)
+ * EmoContext [[Google Drive]](https://drive.google.com/file/d/1lWynwK3RqPvaNTbBRVlbFnMk-KYm5XlY/view?usp=sharing)
  * EmoInt:
      * Joy [[Google Drive]](https://drive.google.com/file/d/1hihlFan3nT0ywKTt7jJyH0x5Ppt2-RVc/view?usp=sharing)
      * Fear [[Google Drive]](https://drive.google.com/file/d/1dEO-fi7g-Hg-5ukou3vlsErZTHJ-0QuQ/view?usp=sharing)
      * Sad [[Google Drive]](https://drive.google.com/file/d/1ESwLbWHKOj36RC2Bl2bhYs28bYPWlrlI/view?usp=sharing)
-     * Anger [[Google Drive]](https://drive.google.com/file/d/1KvH_TxovrfMmzftF5nzQ7yZreFAlaIfk/view?usp=sharing)
- * Twitter Sentiment Analysis [Google Drive]
+     * Anger [[Google Drive]](https://drive.google.com/file/d/19JRvifGQDf59oZECErFDwctQ_zU8JWqi/view?usp=sharing)
+ * Twitter Sentiment Analysis [[Google Drive]](https://drive.google.com/file/d/10YtL0R0Kk9ZVw7gX56xM31QjTWF0XP9X/view?usp=sharing)
 
 The implementation details and results are shown below:
 
-*Note: 1) BERT* *denotes BERT w/ Mean pooling. 2) The results of subtasks in EmoInt is (Joy: 66.27, 64.53, 4 epochs, seed: 30), (Anger: 65.18, 64.02, 5 epochs, seed: 30), (Sad: 64.84, 61.03, 5 epochs, seed: 777), (Fear: 65.74, 62.41, 5 epochs, seed: 29), respectively.*
+*Note: 1) BERT* *denotes BERT w/ Mean pooling. 2) The results of subtasks in EmoInt is (Joy: 68.90, 65.18, 4 epochs), (Anger: 68.17, 66.73, 4 epochs), (Sad: 66.25, 63.08, 5 epochs), (Fear: 65.49, 64.79, 5 epochs), respectively.*
 <table>
   <tr>
     <th>Models</th>
@@ -210,7 +210,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">1</td>
     <td class="tg-0pky">77</td>
-    <td class="tg-0pky">**92.55**</td>
+    <td class="tg-0pky">**93.25**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT</td>
@@ -237,7 +237,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">5</td>
     <td class="tg-0pky">77</td>
-    <td class="tg-0pky">73.72</td>
+    <td class="tg-0pky">73.35</td>
   </tr>
   <tr>
     <td class="tg-baqh" colspan="6">EmoContext</td>
@@ -248,7 +248,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">1</td>
     <td class="tg-0pky">0</td>
-    <td class="tg-0pky">**74.84**</td>
+    <td class="tg-0pky">**74.47**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT</td>
@@ -266,16 +266,35 @@ The implementation details and results are shown below:
     <td class="tg-0pky">16</td>
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">4 or 5</td>
-    <td class="tg-0pky">---</td>
-    <td class="tg-0pky">**65.51**</td>
+    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">**67.20**</td>
   </tr>
   <tr>
     <td class="tg-0pky">BERT</td>
     <td class="tg-0pky">16</td>
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">4 or 5</td>
-    <td class="tg-0pky">---</td>
-    <td class="tg-0pky">63.00</td>
+    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">64.95</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh" colspan="6">Twitter</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">SentiBERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">6e-5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">45</td>
+    <td class="tg-0pky">**70.2**</td>
+  </tr>
+  <tr>
+    <td class="tg-0pky">BERT</td>
+    <td class="tg-0pky">32</td>
+    <td class="tg-0pky">6e-5</td>
+    <td class="tg-0pky">1</td>
+    <td class="tg-0pky">45</td>
+    <td class="tg-0pky">69.7</td>
   </tr>
 </table>
 
