@@ -30,14 +30,15 @@ Datasets include:
 * EmoContext (SemEval 2019 Task 3)
 * EmoInt (Joy, Fear, Sad, Anger) (SemEval 2018 Task 1c)
 ```
+*Note that there are no individual datasets for SST-5. When evaluating SST-phrase, the results for SST-5 should also appear.* 
 
 ### File Architecture (Selected important files)
 ```
 -- /examples/run_classifier_new.py                                  ---> start to train
 -- /examples/run_classifier_dataset_utils_new.py                    ---> input preprocessed files to SentiBERT
 -- /pytorch-pretrained-bert/modeling_new.py                         ---> detailed model architecture
--- /examples/lm_finetuning/pregenerate_training_data_sstphrase.py   ---> generate pretrained epoches
--- /examples/lm_finetuning/finetune_on_pregenerated_sstphrase.py    ---> pretrain on generated epoches
+-- /examples/lm_finetuning/pregenerate_training_data_sstphrase.py   ---> generate pretrained epochs
+-- /examples/lm_finetuning/finetune_on_pregenerated_sstphrase.py    ---> pretrain on generated epochs
 -- /preprocessing/xxx_st.py                                         ---> preprocess raw text and constituency tree
 -- /datasets                                                        ---> datasets
 -- /transformers (under construction)                               ---> RoBERTa part
@@ -71,15 +72,28 @@ java -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,sspl
 The tree information will be stored in `/stanford-corenlp-full-2018-10-05/sst2_train\dev_text.txt.json`.
 * For **SST-phrase** and **SST-3,5**, the tree information was already stored in `sstphrase_train\test.txt`.
 
-3. Run `/datasets/xxx/xxx_st.py` to clean, and store the text and label information in `xxx_train\dev\test_text_new.txt` and `xxx_label_train\dev\test.npy`. It also transforms the tree structure into matrices `/datasets/xxx/xxx_train\dev\test_span.npy` and `/datasets/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as the range of constituencies in the first layer of our attention mechanism. The second matrix is used as the indices of each constituency's children nodes or subwords and itself in the second layer. Specifically, the command is like below:
+3. Run `/datasets/xxx/xxx_st.py` to clean, and store the text and label information in `xxx_train\dev\test_text_new.txt` and `xxx_label_train\dev\test.npy`. It also transforms the tree structure into matrices `/datasets/xxx/xxx_train\dev\test_span.npy` and `/datasets/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as the range of constituencies in the first layer of our attention mechanism. The second matrix is used as the indices of each constituency's children nodes or subwords and itself in the second layer. Specifically, for tasks **other than EmoInt, SST-phrase, SST-5 and SST-3**, the command is like below:
 ```
 python xxx_st.py \
         --data_dir /datasets/xxx/ \                         ---> the location where you want to store preprocessed text, label and tree information 
         --tree_dir /stanford-corenlp-full-2018-10-05/ \     ---> the location of unpreprocessed tree information (usually in Stanford CoreNLP repo)
         --stage train \                                     ---> "train", "test" or "dev"
+```
+For **EmoInt**, the command is shown below:
+```
+python xxx_st.py \
+        --data_dir /datasets/xxx/ \                         ---> the location where you want to store preprocessed text, label and tree information 
+        --tree_dir /stanford-corenlp-full-2018-10-05/ \     ---> the location of unpreprocessed tree information (usually in Stanford CoreNLP repo)
+        --stage train \                                     ---> "train" or "test"
         --domain joy                                        ---> "joy", "sad", "fear" or "anger". Used in EmoInt task
 ```
-Note that SST-phrase already has tree information in `sstphrase_train\test.txt`. In this case, tree_dir should be `/datasets/sstphrase/`.
+For **SST-phrase, SST-5 and SST-3**, since they already have tree information in `sstphrase_train\test.txt`. In this case, tree_dir should be `/datasets/sstphrase/` or `/datasets/sst-3/`. The command is shown below:
+```
+python xxx_st.py \
+        --data_dir /datasets/xxx/ \                         ---> the location where you want to store preprocessed text, label and tree information 
+        --tree_dir /datasets/xxx/ \                         ---> the location of unpreprocessed tree information    
+        --stage train \                                     ---> "train" or "test"
+```
 
 ## Pretraining
 1. Generate epochs for preparation
@@ -135,10 +149,11 @@ For reproducity and usability, we provide checkpoints and the original training 
      * Fear [[Google Drive]](https://drive.google.com/file/d/1dEO-fi7g-Hg-5ukou3vlsErZTHJ-0QuQ/view?usp=sharing)
      * Sad [[Google Drive]](https://drive.google.com/file/d/1ESwLbWHKOj36RC2Bl2bhYs28bYPWlrlI/view?usp=sharing)
      * Anger [[Google Drive]](https://drive.google.com/file/d/1KvH_TxovrfMmzftF5nzQ7yZreFAlaIfk/view?usp=sharing)
- * Twitter Sentiment Analysis [[Google Drive]](https://drive.google.com/file/d/10YtL0R0Kk9ZVw7gX56xM31QjTWF0XP9X/view?usp=sharing)
+ * Twitter Sentiment Analysis [Google Drive]
 
 The implementation details and results are shown below:
-**Note: BERT* denotes BERT w/ Mean pooling. The results of subtasks in EmoInt is (Joy: 66.27, 64.53, 4 epochs, seed: 30), (Anger: 65.18, 64.02, 5 epochs, seed: 30), (Sad: 64.84, 61.03, 5 epochs, seed: 777), (Fear: 65.74, 62.41, 5 epochs, seed: 29), respectively.**
+
+*Note: 1) BERT* *denotes BERT w/ Mean pooling. 2) The results of subtasks in EmoInt is (Joy: 66.27, 64.53, 4 epochs, seed: 30), (Anger: 65.18, 64.02, 5 epochs, seed: 30), (Sad: 64.84, 61.03, 5 epochs, seed: 777), (Fear: 65.74, 62.41, 5 epochs, seed: 29), respectively.*
 <table>
   <tr>
     <th>Models</th>
