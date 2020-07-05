@@ -209,7 +209,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">32</td>
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">1</td>
-    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">30</td>
     <td class="tg-0pky">**93.25**</td>
   </tr>
   <tr>
@@ -217,7 +217,7 @@ The implementation details and results are shown below:
     <td class="tg-0pky">32</td>
     <td class="tg-0pky">2e-5</td>
     <td class="tg-0pky">1</td>
-    <td class="tg-0pky">77</td>
+    <td class="tg-0pky">30</td>
     <td class="tg-0pky">92.08</td>
   </tr>
   <tr>
