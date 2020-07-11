@@ -86,8 +86,8 @@ args = parser.parse_args()
 
 data_dir = args.data_dir
 tree_dir = args.tree_dir
-f1 = open(os.path.join(tree_dir, args.stage+"_new.txt"), 'r')
-f2 = open(os.path.join(data_dir, args.stage+"_text_new.txt"), 'w')
+f1 = open(os.path.join(tree_dir, "sstphrase_"+args.stage+".txt"), 'r')
+f2 = open(os.path.join(data_dir, "sstphrase_"+args.stage+"_text_new.txt"), 'w')
 
 max_len = 128
 but_sum = 0
@@ -424,10 +424,10 @@ for line in f1:
     span_3.append(span_mask_3)    
     
 # print(but_sum)  
-# print(len(span), len(span_3), len(split), len(sentiment_total))
+print(len(span), len(span_3), len(split), len(sentiment_total))
 
-np.save(os.path.join(data_dir, 'span_'+args.stage+'_new.npy'), span)
-np.save(os.path.join(data_dir, 'span_'+args.stage+'_new_3.npy'), span_3)
+np.save(os.path.join(data_dir, 'sstphrase_'+args.stage+'_span.npy'), span)
+np.save(os.path.join(data_dir, 'sstphrase_'+args.stage+'_span_3.npy'), span_3)
 if args.stage == "test":
     np.save(os.path.join(data_dir, 'swap_'+args.stage+'_new.npy'), swap)
     np.save(os.path.join(data_dir, 'edge_'+args.stage+'_new.npy'), edge)
@@ -435,8 +435,8 @@ if args.stage == "test":
     np.save(os.path.join(data_dir, 'but_new.npy'), but)
     np.save(os.path.join(data_dir, 'neg_new.npy'), neg)
 
-np.save(os.path.join(data_dir, 'split_'+args.stage+'_new.npy'), split)
-np.save(os.path.join(data_dir, 'sentiment_'+args.stage+'_new.npy'), sentiment_total)
+np.save(os.path.join(data_dir, 'sstphrase_split_'+args.stage+'.npy'), split)
+np.save(os.path.join(data_dir, 'sstphrase_label_'+args.stage+'.npy'), sentiment_total)
     
 f1.close()
 f2.close()
