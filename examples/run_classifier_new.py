@@ -59,7 +59,12 @@ def main():
                         default=None,
                         type=str,
                         required=True,
-                        help="The input data dir. Should contain the .tsv files (or other data files) for the task.")
+                        help="The input data dir.")
+    parser.add_argument("--pretrain_dir",
+                        default=None,
+                        type=str,
+                        required=True,
+                        help="The pretrained para on SST-phrase.")
     parser.add_argument("--bert_model", default=None, type=str, required=True,
                         help="Bert pre-trained model selected in the list: bert-base-uncased, "
                         "bert-large-uncased, bert-base-cased, bert-large-cased, bert-base-multilingual-uncased, "
@@ -222,12 +227,12 @@ def main():
     
     if task_name == "sstphrase" or task_name == "sst-3":
         if args.para == "sentibert":
-            model = BertForPhraseClassification.from_pretrained("/local/harold/backup_code_wade/pytorch-pretrained-BERT/results/sstphrase_pretrain", num_labels=num_labels)
+            model = BertForPhraseClassification.from_pretrained(args.pretrain_dir, num_labels=num_labels)
         else:
             model = BertForPhraseClassification.from_pretrained(args.bert_model, num_labels=num_labels)
     else:
         if args.para == "sentibert":
-            model = BertForSequenceClassification.from_pretrained("/local/harold/backup_code_wade/pytorch-pretrained-BERT/results/sstphrase_pretrain", num_labels=num_labels)
+            model = BertForSequenceClassification.from_pretrained(args.pretrain_dir, num_labels=num_labels)
         else:
             model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
 

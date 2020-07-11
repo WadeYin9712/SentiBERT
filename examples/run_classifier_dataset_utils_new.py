@@ -774,7 +774,7 @@ def convert_examples_to_features_phrase(examples, max_seq_length,
         edge_swap = np.load(os.path.join(data_dir, "edge_swap_test_new.npy"))
         but = np.load(os.path.join(data_dir, "but_new.npy"))
         neg = np.load(os.path.join(data_dir, "neg_new.npy"))
-        text_tmp = open("test_text_new.txt", 'r')
+        text_tmp = open(os.path.join(data_dir, "sstphrase_test_text_new.txt"))
     
         text = []
         for line in text_tmp:
