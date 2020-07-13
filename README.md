@@ -12,7 +12,7 @@ https://arxiv.org/abs/2005.04114
 ```
 * Python == 3.6.10
 * Pytorch == 1.1.0
-* CUDA == 10.2
+* CUDA == 9.0.176
 * NVIDIA GeForce GTX 1080 Ti
 * HuggingFaces Pytorch (also known as pytorch-pretrained-bert & transformers)
 * Stanford CoreNLP (stanford-corenlp-full-2018-10-05)
@@ -47,11 +47,15 @@ Datasets include:
 ## Get Started
 ### Preparing Environment
 ```
-pip install -r requirements.txt
+conda create -n sentibert python=3.6.10
+conda activate sentibert
+
+conda install pytorch==1.1.0 torchvision==0.3.0 cudatoolkit=9.0 -c pytorch
 
 wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
 unzip http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
 
+export PYTHONPATH=$PYTHONPATH:XX/SentiBERT/pytorch_pretrained_bert
 export PYTHONPATH=$PYTHONPATH:XX/SentiBERT/
 export PYTHONPATH=$PYTHONPATH:XX/
 ```
@@ -100,6 +104,7 @@ python xxx_st.py \
 ```
 python3 pregenerate_training_data_sstphrase.py \
         --train_corpus /datasets/sstphrase/sstphrase_train_text_new.txt \
+        --data_dir /datasets/sstphrase/ \
         --bert_model bert-base-uncased \
         --do_lower_case \
         --output_dir /training_sstphrase \
@@ -126,6 +131,7 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
   --do_eval \
   --do_lower_case \
   --data_dir /datasets/xxx \                     ---> the same name as task_name
+  --pretrain_dir /results/sstphrase_pretrain \   ---> the location of pre-trained parameters
   --bert_model bert-base-uncased \
   --max_seq_length 128 \
   --train_batch_size xxx \
