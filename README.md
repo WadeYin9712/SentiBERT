@@ -52,8 +52,10 @@ conda activate sentibert
 
 conda install pytorch==1.1.0 torchvision==0.3.0 cudatoolkit=9.0 -c pytorch
 
+cd SentiBERT/
+
 wget http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
-unzip http://nlp.stanford.edu/software/stanford-corenlp-full-2018-10-05.zip
+unzip stanford-corenlp-full-2018-10-05.zip
 
 export PYTHONPATH=$PYTHONPATH:XX/SentiBERT/pytorch_pretrained_bert
 export PYTHONPATH=$PYTHONPATH:XX/SentiBERT/
