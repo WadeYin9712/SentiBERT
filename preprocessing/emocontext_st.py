@@ -117,7 +117,7 @@ for line in f2:
     
     idx += 1
     
-emocontext_label = np.load(os.path.join(args.tree_dir, 'emocontext_'+args.stage+'_label.npy'))
+emocontext_label = np.load(os.path.join(args.data_dir, 'emocontext_'+args.stage+'_label.npy'))
 expression = []  
 sen_set = data["sentences"]
 
