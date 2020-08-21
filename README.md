@@ -80,6 +80,8 @@ The tree information will be stored in `/stanford-corenlp-full-2018-10-05/sst2_t
 
 3. Run `/datasets/xxx/xxx_st.py` to clean, and store the text and label information in `xxx_train\dev\test_text_new.txt` and `xxx_label_train\dev\test.npy`. It also transforms the tree structure into matrices `/datasets/xxx/xxx_train\dev\test_span.npy` and `/datasets/xxx/xxx_train\dev\test_span_3.npy`. The first matrix is used as the range of constituencies in the first layer of our attention mechanism. The second matrix is used as the indices of each constituency's children nodes or subwords and itself in the second layer. Specifically, for tasks **other than EmoInt, SST-phrase, SST-5 and SST-3**, the command is like below:
 ```
+cd /preprocessing
+
 python xxx_st.py \
         --data_dir /datasets/xxx/ \                         ---> the location where you want to store preprocessed text, label and tree information 
         --tree_dir /stanford-corenlp-full-2018-10-05/ \     ---> the location of unpreprocessed tree information (usually in Stanford CoreNLP repo)
@@ -87,6 +89,8 @@ python xxx_st.py \
 ```
 For **EmoInt**, the command is shown below:
 ```
+cd /preprocessing
+
 python xxx_st.py \
         --data_dir /datasets/xxx/ \                         ---> the location where you want to store preprocessed text, label and tree information 
         --tree_dir /stanford-corenlp-full-2018-10-05/ \     ---> the location of unpreprocessed tree information (usually in Stanford CoreNLP repo)
@@ -95,6 +99,8 @@ python xxx_st.py \
 ```
 For **SST-phrase, SST-5 and SST-3**, since they already have tree information in `sstphrase_train\test.txt`. In this case, tree_dir should be `/datasets/sstphrase/` or `/datasets/sst-3/`. The command is shown below:
 ```
+cd /preprocessing
+
 python xxx_st.py \
         --data_dir /datasets/xxx/ \                         ---> the location where you want to store preprocessed text, label and tree information 
         --tree_dir /datasets/xxx/ \                         ---> the location of unpreprocessed tree information    
@@ -104,6 +110,8 @@ python xxx_st.py \
 ## Pretraining
 1. Generate epochs for preparation
 ```
+cd /examples/lm_finetuning
+
 python3 pregenerate_training_data_sstphrase.py \
         --train_corpus /datasets/sstphrase/sstphrase_train_text_new.txt \
         --data_dir /datasets/sstphrase/ \
@@ -127,6 +135,8 @@ The pre-trained parameters were released here. [[Google Drive]](https://drive.go
 ## Fine-tuning 
 Run run_classifier_new.py directly as follows:
 ```
+cd /examples
+
 CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
   --task_name xxx \                              ---> task name
   --do_train \
