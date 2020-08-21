@@ -147,6 +147,7 @@ CUDA_VISIBLE_DEVICES=7 python run_classifier_new.py \
 
 ## Checkpoints
 For reproducity and usability, we provide checkpoints and the original training settings to help you reproduce:
+Link of overall result folder: [[Google Drive]](https://drive.google.com/drive/folders/1taN98qyMLxP4IDf79W6OG9bpRCgIv31Y?usp=sharing)
  * SST-phrase [[Google Drive]](https://drive.google.com/file/d/1bGadvbVTJ3tVvKCy_U05OfbZ9OdsJjQV/view?usp=sharing)
  * SST-5 [[Google Drive]](https://drive.google.com/file/d/1bGadvbVTJ3tVvKCy_U05OfbZ9OdsJjQV/view?usp=sharing)
  * SST-2 [[Google Drive]](https://drive.google.com/file/d/1r1QPiWXuvf4epVLor2RPD9nbEo5S__Rz/view?usp=sharing)
