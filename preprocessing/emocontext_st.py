@@ -336,15 +336,15 @@ for i in range(len(expression)):
             span_3_tmp.append(0)
                 
         if len(son_index) == 2:
+            for t in range(max_len-1):
+                span_3_tmp.append(0)
             for t in range(max_len):
                 if t == par_index - tot_word:
                     span_3_tmp.append(1)
                 else:
                     span_3_tmp.append(span_extended[t])
             span_3_tmp.append(0)
-                
-        for t in range(max_len * 2 - len(span_3_tmp)):
-            span_3_tmp.append(0)
+            
         span_mask_3.append(span_3_tmp)
         
     for t in range(max_len - len(span_mask_3)):
